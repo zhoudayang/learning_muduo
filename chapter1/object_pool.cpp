@@ -76,6 +76,7 @@ private:
     static void weakDeleteCallback(const weak_ptr<StockFactory> &wkFactory, Stock *stock) {
         //尝试提升StockFactory对象
         //需要判断factory对象是否有效
+        //此时factory对象可能已经被析构
         shared_ptr<StockFactory> factory(wkFactory.lock());
         if (factory) {//factory对象健在,从map容器中清理该Stock
             factory->removeStock(stock);
