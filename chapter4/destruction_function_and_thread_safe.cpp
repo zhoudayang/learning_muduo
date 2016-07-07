@@ -53,7 +53,7 @@ void *threadFunc1(void *parm) {
     string region2 = "British";
     for (int i = 0; i < 10; i++) {
         if (getCalendar(region1).isHoliday("nothing")) {
-            printf("this day is American holiday! <- thread2\n");
+            printf("this day is American holiday! <- thread1\n");
         }
         if (getCalendar(region2).isHoliday("nothing")) {
             printf("this day is British holiday!  <- thread1\n");
@@ -84,7 +84,7 @@ void *threadFunc2(void *parm) {
             printf("this day is American holiday! <- thread2\n");
         }
         if (getCalendar(region2).isHoliday("nothing")) {
-            printf("this day is British holiday!  <- thread1\n");
+            printf("this day is British holiday!  <- thread2\n");
         }
     }
 }
