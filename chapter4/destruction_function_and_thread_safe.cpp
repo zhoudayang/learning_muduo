@@ -1,7 +1,8 @@
-#include<iostream>
+#include<stdio.h>
+#include<string>
 #include<pthread.h>
 
-using namespace std;
+using std::string;
 
 class calendar {
 public:
