@@ -4,7 +4,7 @@ from SocketServer import BaseRequestHandler, TCPServer
 from SocketServer import ForkingTCPServer, ThreadingTCPServer
 
 
-#  传统UNIX并发编程方案，适合并发连接数不大的情况，俗称：process-per-connection
+#  传统UNIX并发编程方案，适合并发连接数不大的情况，俗称：process-per-connection,每个连接使用一个进程来处理
 class EchoHandler(BaseRequestHandler):
     def handle(self):
         print "got connection from", self.client_address
