@@ -14,7 +14,7 @@ class EchoHandler(BaseRequestHandler):
                 print "the client says ", data
                 sent = self.request.send(data)
             else:
-                print "disconnect", self.client_address
+                print "disconnect ", self.client_address
                 self.request.close()
                 break
 
