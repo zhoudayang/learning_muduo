@@ -1,6 +1,4 @@
-//
-// Created by fit on 16-7-22.
-//
+
 
 #include "daytime.h"
 #include<muduo/base/Logging.h>
