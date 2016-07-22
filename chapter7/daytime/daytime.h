@@ -1,6 +1,4 @@
-//
-// Created by fit on 16-7-22.
-//
+
 
 #ifndef DAYTIME_DAYTIME_H
 #define DAYTIME_DAYTIME_H
