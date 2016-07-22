@@ -1,6 +1,4 @@
-//
-// Created by fit on 16-7-22.
-//
+
 
 #ifndef DISCARD_DISCARD_H
 #define DISCARD_DISCARD_H
