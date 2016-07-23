@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.5)
+project(chargen_client)
+find_package(Threads)
+include_directories(/home/fit/Documents/muduo/include)
+link_directories(/home/fit/Documents/muduo/lib)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+set(SOURCE_FILES main.cpp)
+add_executable(chargen_client ${SOURCE_FILES})
+target_link_libraries(chargen_client muduo_net muduo_base ${CMAKE_THREAD_LIBS_INIT})
