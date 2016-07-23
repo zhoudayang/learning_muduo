@@ -24,6 +24,7 @@ void TimeClient::onConnection(const TcpConnectionPtr &con) {
              << con->peerAddress().toIpPort()
              << " is "
              << (con->connected() ? "up" : "down");
+//连接断开，退出事件循环，程序终止
     if (!con->connected()) {
         loop_->quit();
     }
