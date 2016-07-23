@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.5)
+project(filetransfer)
+find_package(Threads)
+include_directories(/home/zhouyang/Documents/muduo/include)
+link_directories(/home/zhouyang/Documents/muduo/lib)
+set(SOURCE_FILES main.cpp)
+add_executable(filetransfer ${SOURCE_FILES})
+target_link_libraries(filetransfer muduo_net muduo_base ${CMAKE_THREAD_LIBS_INIT})
