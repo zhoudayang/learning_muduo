@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.5)
+project(chargen)
+find_package(Threads)
+include_directories(/home/fit/Documents/muduo/include)
+link_directories(/home/fit/Documents/muduo/lib)
+set(SOURCE_FILES main.cpp chargen.cpp chargen.h)
+add_executable(chargen ${SOURCE_FILES})
+target_link_libraries(chargen muduo_net muduo_base ${CMAKE_THREAD_LIBS_INIT})
