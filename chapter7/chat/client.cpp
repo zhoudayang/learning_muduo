@@ -41,6 +41,7 @@ public:
     }
 
 private:
+    //onConnetion 会被EventLoop 线程调用，所以要加锁保护shared_ptr
     void onConnection(const TcpConnectionPtr &con) {
         LOG_INFO << con->localAddress().toIpPort() << " -> "
                  << con->peerAddress().toIpPort() << " is "
