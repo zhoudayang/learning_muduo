@@ -33,7 +33,8 @@ public class Client {
         }
     }
 
-    static final int kclients = 500;
+    //模拟kclients个客户端
+    static final int kclients = 200;
     static final int kMB = 1024 * 1024;
     static final int kMinLength = 1 * kMB;
     static final int kMaxLength = 6 * kMB;
@@ -52,6 +53,7 @@ public class Client {
             bootstrap.connect(new InetSocketAddress("127.0.0.1", 2016));
         }
         latch.await();
+        //所有客户端完成了文件接收
         System.out.println(Thread.currentThread().getId() + " All done. " +
                 (System.currentTimeMillis() - start));
         System.exit(0);

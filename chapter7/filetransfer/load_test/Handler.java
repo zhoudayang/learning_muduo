@@ -32,6 +32,7 @@ public class Handler extends SimpleChannelUpstreamHandler {
         System.out.println("chanelConnected tid=" + Thread.currentThread().getId() + " " + id);
     }
 
+
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         byte[] md5 = digest.digest();
