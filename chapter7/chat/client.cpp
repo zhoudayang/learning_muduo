@@ -21,6 +21,7 @@ public:
               codec_(boost::bind(&ChatClient::onStringMessage, this, _1, _2, _3)) {
         client_.setConnectionCallback(boost::bind(&ChatClient::onConnection, this, _1));
         client_.setMessageCallback(boost::bind(&LengthHeaderCodec::onMessage, &codec_, _1, _2, _3));
+        client_.enableRetry();
     }
 
     void connect() {
