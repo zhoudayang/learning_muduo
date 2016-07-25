@@ -65,7 +65,9 @@ int main() {
     LOG_INFO << " pid = " << getpid() << ",tid= " << CurrentThread::tid();
     EventLoop loop;
     InetAddress serverAddr("localhost", 2018);
-    int size = 256;
+    //在本机上运行的时候，消息的长度和服务器的吞吐量大致为线性关系，服务器最大吞吐量可以达到1400mb/s左右，
+    //如果在局域网上运行，受限于局域网带宽，最高只能达到10mb/s
+    int size = 65536;
     DiscardClient client(&loop, serverAddr, size);
     client.connect();
     loop.loop();
