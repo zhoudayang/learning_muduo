@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.5)
+project(discard)
+find_package(Threads)
+include_directories(/home/zhouyang/Documents/muduo/include)
+link_directories(/home/zhouyang/Documents/muduo/lib)
+add_executable(server server.cpp)
+add_executable(client client.cpp)
+target_link_libraries(server muduo_base muduo_net ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(client muduo_base muduo_net ${CMAKE_THREAD_LIBS_INIT})
+
