@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.5)
+project(roundtrip)
+find_package(Threads)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+include_directories(/home/zhouyang/Documents/muduo/include)
+link_directories(/home/zhouyang/Documents/muduo/lib)
+add_executable(roundtrip roundtrip.cpp)
+target_link_libraries(roundtrip muduo_base muduo_net ${CMAKE_THREAD_LIBS_INIT} )
+#add_executable(roundtrip_udp roundtrip_udp.cpp)
+#target_link_libraries(roundtrip_udp muduo_base muduo_net ${CMAKE_THREAD_LIBS_INIT})
+
