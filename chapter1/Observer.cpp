@@ -22,6 +22,7 @@ public:
 
 private:
     //使用thread中自带的锁
+    //请注意这里必须是引用对象
     mutex &mutex_;
 };
 
@@ -83,11 +84,12 @@ int main() {
     //此处必须存储这些Observer对象,否则这些对象在离开循环作用域之后将被销毁
     vector<shared_ptr<Observer>> Observers;
     for(int i =0;i<5;i++){
-        shared_ptr <Observer >ptr1 (new Observer(observable));
-        weak_ptr<Observer> ptr2(ptr1);
-        Observers.push_back(ptr1);
-        observable->register_(ptr2);
+        shared_ptr <Observer >ptr (new Observer(observable));
+        weak_ptr<Observer> weakPtr(ptr);
+        observable->register_(weakPtr);
+         Observers.push_back(ptr);
     }
+    //通知观察者
     observable->notifyObservers();
 
     return 0;
