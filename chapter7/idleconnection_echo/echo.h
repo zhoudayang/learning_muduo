@@ -42,7 +42,8 @@ private:
 
     struct Entry {
         explicit Entry(const WeakTcpconnectionPtr &weakConn) : weakConn_(weakConn) {}
-
+        //done!
+        // Entry的析构函数会判断连接是否存在，并将存在的连接断开处理，对应心跳算法中释放连接
         ~Entry() {
             muduo::net::TcpConnectionPtr con = weakConn_.lock();
             if (con)
