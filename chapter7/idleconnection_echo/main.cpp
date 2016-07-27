@@ -24,9 +24,7 @@ void testHash() {
     x2.reset();
     assert(h(x1) == h(x2));
 }
-//!!!!
-//todo 关于头部Bucket中con的释放有待探究
-//!!!!
+
 int main() {
     testHash();
     EventLoop loop;
