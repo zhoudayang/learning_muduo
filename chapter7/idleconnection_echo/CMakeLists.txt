@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.5)
+project(new_project)
+find_package(Threads)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+include_directories(/home/fit/Documents/muduo/include)
+link_directories(/home/fit/Documents/muduo/lib)
+add_executable(idleconnection_echo main.cpp echo.h echo.cpp)
+target_link_libraries(idleconnection_echo muduo_base muduo_net ${CMAKE_THREAD_LIBS_INIT})
