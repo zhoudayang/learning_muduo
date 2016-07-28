@@ -26,6 +26,7 @@ namespace {
             boost::shared_ptr<pid_t> ptid = wkTid_.lock();
             if (ptid) {
                 *ptid = tid;
+                //ptid不再管理任何对象
                 ptid.reset();
             }
             muduo::CurrentThread::t_threadName = name_.c_str();
