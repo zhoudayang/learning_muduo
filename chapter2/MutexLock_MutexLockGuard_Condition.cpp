@@ -189,7 +189,6 @@ void worker2() {
         lock_guard<mutex> lock(print_lock);
         cout << "worker 2 begin to work" << endl;
     }
-    test.countDown();
     sleep(2);
     test.countDown();
     {
