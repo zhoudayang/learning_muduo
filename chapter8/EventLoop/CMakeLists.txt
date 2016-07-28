@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.5)
+project(test)
+find_package(Threads)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+set(SOURCE_FILES main.cpp Thread.h)
+add_executable(test_it ${SOURCE_FILES})
+target_link_libraries(test_it ${CMAKE_THREAD_LIBS_INIT})
