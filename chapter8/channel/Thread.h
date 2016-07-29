@@ -7,6 +7,7 @@
 #include <sys/syscall.h>
 #include <boost/function.hpp>
 #include "Atomic.h"
+#include <pthread.h>
 
 namespace muduo {
     namespace detail {

@@ -10,6 +10,14 @@
 
 #include <poll.h>
 
+#ifdef __APPLE__
+#define _DARWIN_C_SOURCE
+#endif
+
+#ifndef POLLRDHUP
+#define POLLRDHUP 0x2000
+#endif
+
 using namespace muduo;
 
 const int Channel::kNoneEvent = 0;
