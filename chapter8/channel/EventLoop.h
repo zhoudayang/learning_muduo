@@ -39,13 +39,16 @@ namespace muduo {
     private:
         void abortNotInLoopThread();
 
+        //存放 Channel * 指针的 vector数组
         typedef std::vector<Channel *> ChannelList;
 
         bool looping_;
         bool quit_;
+        // EventLoop 所在的线程的pit_d值
         const pid_t threadId_;
+        // 使用scoped_ptr会在指针离开作用域的时候自动释放管理的对象
         boost::scoped_ptr<Poller> poller_;
-        ChannelList activeChannels;
+        ChannelList activeChannels_;
     };
 
 

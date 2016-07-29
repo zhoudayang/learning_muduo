@@ -35,7 +35,7 @@ void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) cons
         if (pfd->revents > 0) {
             --numEvents;
             ChannelMap::const_iterator ch = channels_.find(pfd->fd);
-            assert(ch != channels.end());
+            assert(ch != channels_.end());
             Channel *channel = ch->second;
             assert(channel->fd() == pfd->fd);
             channel->set_revents(pfd->revents);
@@ -43,8 +43,7 @@ void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) cons
         }
     }
 }
-
-void Poller::updatechannel(Channel *channel) {
+void Poller::updateChannel(Channel *channel) {
     assertInLoopThread();
     printf("fd = %ld events = %d\n", channel->fd(), channel->events());
     if (channel->index() < 0) {
@@ -62,7 +61,7 @@ void Poller::updatechannel(Channel *channel) {
         int idx = channel->index();
         assert(0 <= idx && idx < static_cast<int>(pollfds_.size()));
         struct pollfd &pfd = pollfds_[idx];
-        assert(pfd.fd == channel->fd || pfd.fd == -1);
+        assert(pfd.fd == channel->fd() || pfd.fd == -1);
         pfd.events = static_cast<short> (channel->events());
         pfd.revents = 0;
         if (channel->isNoneEvent())

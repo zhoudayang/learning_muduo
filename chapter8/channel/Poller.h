@@ -19,7 +19,7 @@ namespace muduo {
 
     class Poller : boost::noncopyable {
     public:
-        typedef std:vector < Channel * > ChannelList;
+        typedef std::vector < Channel * > ChannelList;
 
         Poller(EventLoop *loop);
 

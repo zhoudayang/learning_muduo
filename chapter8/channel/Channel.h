@@ -43,8 +43,8 @@ namespace muduo {
             revents_ = revt;
         }
 
-        void isNoneEvent() const {
-            return events_ = kNoneEvent;
+        bool isNoneEvent() const {
+            return events_ == kNoneEvent;
         }
 
         void enableReading() {
@@ -60,6 +60,9 @@ namespace muduo {
             index_ = idx;
         }
 
+        EventLoop * ownerLoop(){
+            return loop_;
+        }
     private:
         void update();
 
