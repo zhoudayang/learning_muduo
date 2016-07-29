@@ -11,7 +11,7 @@ namespace muduo {
     namespace detail {
         // 原子操作类
         template<typename T>
-        class AtomicIntegerT  {
+        class AtomicIntegerT : boost::noncopyable {
         public:
             AtomicIntegerT() : value_(0) {}
 

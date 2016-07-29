@@ -34,10 +34,13 @@ namespace muduo {
 
 
     }
+
     Thread::Thread(const ThreadFunc &func, const std::string &n) :
             started_(false), joined_(false), pthreadId_(0), tid_(new pid_t(0)), func_(func), name_(n) {
-
+        numCreated_.increment();
     }
+    //初始化类的静态成员
+    AtomicInt32 Thread::numCreated_;
 }
 
 namespace {

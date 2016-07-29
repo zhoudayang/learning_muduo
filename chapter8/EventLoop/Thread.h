@@ -60,7 +60,9 @@ namespace muduo {
             return name_;
         };
 
-
+        static int numCreated(){
+            return numCreated_.get();
+        }
     private:
         bool started_;
         bool joined_;
@@ -69,7 +71,7 @@ namespace muduo {
         ThreadFunc func_;
         std::string name_;
 
-
+        static muduo::AtomicInt32 numCreated_;
     };
 
 }
