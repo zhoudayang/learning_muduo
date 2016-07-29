@@ -1,20 +1,18 @@
-#include <iostream>
-#include <thread>
-#include "Thread.h"
+#include "EventLoop.h"
 
-using namespace std;
+#include <stdio.h>
 
-void threadFunc(){
-
-    printf("threadFunc: pid = %d, tid = %d\n",getpid(),muduo::CurrentThread::tid());
+void threadFuncC() {
+    printf("threadFunc(): pid = %d,tid = %d\n ", getpid(), muduo::CurrentThread::tid());
+    muduo::EventLoop loop;
+    loop.loop();
 }
-int main(){
-    thread t1(threadFunc);
-    thread t2(threadFunc);
-    thread t3(threadFunc);
-    t1.join();
-    t2.join();
-    t3.join();
 
-    return 0;
+int main() {
+    printf("main(): pid = %d, tid = %d \n", getpid(), muduo::CurrentThread::tid());
+    muduo::EventLoop loop;
+    muduo::Thread thread(threadFuncC, "test_thread");
+    thread.start();
+    loop.loop();
+    pthread_exit(NULL);
 }

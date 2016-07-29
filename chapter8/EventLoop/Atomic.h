@@ -1,6 +1,8 @@
 //
 // Created by fit on 16-7-28.
 //
+#ifndef ATOMIC
+#define ATOMIC
 
 #include <boost/noncopyable.hpp>
 #include <stdint.h>
@@ -9,7 +11,7 @@ namespace muduo {
     namespace detail {
         // 原子操作类
         template<typename T>
-        class AtomicIntegerT : boost::noncopyable {
+        class AtomicIntegerT  {
         public:
             AtomicIntegerT() : value_(0) {}
 
@@ -61,3 +63,4 @@ namespace muduo {
     typedef detail::AtomicIntegerT<int32_t> AtomicInt32;
     typedef detail::AtomicIntegerT<int64_t> AtomicInt64;
 }
+#endif
