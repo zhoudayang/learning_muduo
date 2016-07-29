@@ -1,12 +1,14 @@
 #include <iostream>
-
+#include <thread>
+#include <unistd.h>
 using namespace std;
 
-int main(){
-    int a =1;
-    int b =2;
-    swap(a,b);
-    cout<<a<<endl;
-    cout<<b<<endl;
+void test(){
+    printf("hello world\n");
 
+}
+int main(){
+    thread t1(test);
+    t1.detach();
+    printf("I am main function\n");
 }

@@ -4,6 +4,7 @@
 
 namespace muduo {
     namespace detail {
+        //调用系统内置函数，返回pid_t
         pid_t gettid() {
             return static_cast<pid_t> (::syscall(SYS_gettid));
         }
@@ -61,13 +62,16 @@ namespace {
             pid_t tid = muduo::CurrentThread::tid();
             boost::shared_ptr<pid_t> ptid = wkTid_.lock();
             if (ptid) {
+                //更新ptid的值
                 *ptid = tid;
                 //ptid不再管理任何对象
                 ptid.reset();
                 //将提升的shared_ptr 释放
             }
             muduo::CurrentThread::t_threadName = name_.c_str();
+            //运行绑定的函数
             func_();
+            //执行完毕，更新线程名字
             muduo::CurrentThread::t_threadName = "finish";
         }
 
@@ -88,6 +92,8 @@ void Thread::start() {
     assert(!started_);
     started_ = true;
     ThreadData *data = new ThreadData(func_, name_, tid_);
+    //On success, pthread_create() returns 0; on error, it returns an error
+    //number, and the contents of *thread are undefined.
     if (pthread_create(&pthreadId_, NULL, &startThread, data)) {
         started_ = false;
         delete data;

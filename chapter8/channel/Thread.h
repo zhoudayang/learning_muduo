@@ -17,8 +17,9 @@ namespace muduo {
 namespace muduo {
     namespace CurrentThread {
 
+        //缓存pid_t
         void cacheTid();
-
+        //获取pid_t
         int tid();
 
     }
@@ -33,6 +34,7 @@ namespace muduo {
         Thread(const ThreadFunc &func, const std::string &n);
 
         ~Thread() {
+            //分离线程，不再和此线程有任何联系
             if (started_ && !joined_) {
                 pthread_detach(pthreadId_);
             }
@@ -44,6 +46,7 @@ namespace muduo {
             assert(started_);
             assert(!joined_);
             joined_ = true;
+            //阻塞直至线程运行完成
             pthread_join(pthreadId_, NULL);
         }
 
@@ -70,7 +73,7 @@ namespace muduo {
         boost::shared_ptr<pid_t> tid_;
         ThreadFunc func_;
         std::string name_;
-
+        //创建的线程数量
         static muduo::AtomicInt32 numCreated_;
     };
 
