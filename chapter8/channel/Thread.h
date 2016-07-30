@@ -4,6 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <assert.h>
+#include <unistd.h>
 #include <sys/syscall.h>
 #include <boost/function.hpp>
 #include "Atomic.h"

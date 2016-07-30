@@ -1,5 +1,5 @@
 //
-// Created by fit on 16-7-29.
+// Created by zhouyang on 16-7-29.
 //
 
 #include "Poller.h"
@@ -11,16 +11,19 @@
 
 using namespace muduo;
 
+//construction
 Poller::Poller(EventLoop *loop)
         : ownerLoop_(loop) {}
 
 Poller::~Poller() {}
 
 Timestamp Poller::poll(int timeoutMs, ChannelList *activeChannels) {
+    //todo    poll function
     int numEvents = ::poll(&*pollfds_.begin(), pollfds_.size(), timeoutMs);
     Timestamp now(Timestamp::now());
     if (numEvents > 0) {
         printf("%d events happended\n", numEvents);
+        //now have numEvents active Channels
         fillActiveChannels(numEvents, activeChannels);
     } else if (numEvents == 0) {
         printf("nothing happended!\n");
@@ -30,22 +33,28 @@ Timestamp Poller::poll(int timeoutMs, ChannelList *activeChannels) {
     return now;
 }
 
+//refresh active channel list
 void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) const {
     for (PollFdList::const_iterator pfd = pollfds_.begin(); pfd != pollfds_.end() && numEvents > 0; ++pfd) {
+        //Types of events that actually occurred.
         if (pfd->revents > 0) {
             --numEvents;
+            //fd: File descriptor to poll
             ChannelMap::const_iterator ch = channels_.find(pfd->fd);
             assert(ch != channels_.end());
             Channel *channel = ch->second;
             assert(channel->fd() == pfd->fd);
             channel->set_revents(pfd->revents);
+            // active channel list add one
             activeChannels->push_back(channel);
         }
     }
 }
+
+//处理channel订阅的事件和初始化等问题
 void Poller::updateChannel(Channel *channel) {
     assertInLoopThread();
-    printf("fd = %ld events = %d\n", channel->fd(), channel->events());
+    printf("fd = %d events = %d\n", channel->fd(), channel->events());
     if (channel->index() < 0) {
         assert(channels_.find(channel->fd()) == channels_.end());
         struct pollfd pfd;
@@ -53,7 +62,9 @@ void Poller::updateChannel(Channel *channel) {
         pfd.revents = 0;
         pollfds_.push_back(pfd);
         int idx = static_cast<int>(pollfds_.size()) - 1;
+        //set index
         channel->set_index(idx);
+        //key fd value channel
         channels_[pfd.fd] = channel;
     } else {
         assert(channels_.find(channel->fd()) != channels_.end());
@@ -63,6 +74,7 @@ void Poller::updateChannel(Channel *channel) {
         struct pollfd &pfd = pollfds_[idx];
         assert(pfd.fd == channel->fd() || pfd.fd == -1);
         pfd.events = static_cast<short> (channel->events());
+        //reset revents to 0
         pfd.revents = 0;
         if (channel->isNoneEvent())
             pfd.fd = -1;

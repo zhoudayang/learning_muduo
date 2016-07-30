@@ -1,5 +1,5 @@
 //
-// Created by fit on 16-7-29.
+// Created by zhouyang on 16-7-29.
 //
 
 #include "EventLoop.h"
@@ -20,12 +20,11 @@ EventLoop::EventLoop()
         : looping_(false), quit_(false),
           threadId_(CurrentThread::tid()),
           poller_(new Poller(this)) {
-    printf("EventLoop created %p in thread %ld \n", this, threadId_);
+    printf("EventLoop created %p in thread %u \n", this, threadId_);
     if (t_loopInThisThread) {
-        printf("Another EventLoop %p exists in this thread %ld\n", t_loopInThisThread, threadId_);
+        printf("Another EventLoop %p exists in this thread %u\n", t_loopInThisThread, threadId_);
     } else
         t_loopInThisThread = this;
-
 }
 
 EventLoop::~EventLoop() {
@@ -52,7 +51,6 @@ void EventLoop::loop() {
 
 void EventLoop::quit() {
     quit_ = true;
-
 }
 
 void EventLoop::updateChannel(Channel *channel) {
@@ -62,7 +60,7 @@ void EventLoop::updateChannel(Channel *channel) {
 }
 
 void EventLoop::abortNotInLoopThread() {
-    printf("EventLoop::abortNotInLoopThread - EventLoop %p was created in threadId_ = %ld ,current thread id = %ld \n",
+    printf("EventLoop::abortNotInLoopThread - EventLoop %p was created in threadId_ = %u,current thread id = %u \n",
            this, threadId_, CurrentThread::tid());
-
+    abort();
 }
