@@ -17,6 +17,7 @@ Poller::Poller(EventLoop *loop)
 
 Poller::~Poller() {}
 
+//return ChannelList which contains cared occured events
 Timestamp Poller::poll(int timeoutMs, ChannelList *activeChannels) {
     //todo    poll function
     int numEvents = ::poll(&*pollfds_.begin(), pollfds_.size(), timeoutMs);
@@ -32,7 +33,7 @@ Timestamp Poller::poll(int timeoutMs, ChannelList *activeChannels) {
     }
     return now;
 }
-
+//遍历pollfds_，找到有活动的事件的fd,把它对应的Channel填入activeChannels
 //refresh active channel list
 void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) const {
     for (PollFdList::const_iterator pfd = pollfds_.begin(); pfd != pollfds_.end() && numEvents > 0; ++pfd) {
@@ -55,6 +56,7 @@ void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) cons
 void Poller::updateChannel(Channel *channel) {
     assertInLoopThread();
     printf("fd = %d events = %d\n", channel->fd(), channel->events());
+    //a new one, add to pollfds_
     if (channel->index() < 0) {
         assert(channels_.find(channel->fd()) == channels_.end());
         struct pollfd pfd;
@@ -67,6 +69,7 @@ void Poller::updateChannel(Channel *channel) {
         //key fd value channel
         channels_[pfd.fd] = channel;
     } else {
+        //update existing one
         assert(channels_.find(channel->fd()) != channels_.end());
         assert(channels_[channel->fd()] == channel);
         int idx = channel->index();
@@ -77,6 +80,7 @@ void Poller::updateChannel(Channel *channel) {
         //reset revents to 0
         pfd.revents = 0;
         if (channel->isNoneEvent())
+            //如果某一个Channel暂时不关心任何是时间，就将pollfd.fd设为-1,让poll(2)忽略此项
             pfd.fd = -1;
     }
 }

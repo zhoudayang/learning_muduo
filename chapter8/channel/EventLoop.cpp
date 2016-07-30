@@ -39,16 +39,19 @@ void EventLoop::loop() {
     quit_ = false;
     while (!quit_) {
         activeChannels_.clear();
+        //获取当前活动事件的Channel列表
         poller_->poll(kPollTimeMs, &activeChannels_);
         for (ChannelList::iterator it = activeChannels_.begin();
              it != activeChannels_.end(); it++) {
+            //handle occured events
             (*it)->handleEvent();
         }
-        printf("EventLoop %p stop lopping\n", this);
+        printf("EventLoop %p stop this looping\n", this);
         looping_ = false;
     }
 }
 
+//if you want to stop loop, set quit_ to true
 void EventLoop::quit() {
     quit_ = true;
 }

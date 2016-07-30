@@ -24,6 +24,7 @@
 
 */
 
+// forward definition, definition in #include <poll.h> that is in file Poller.cpp
 struct pollfd;
 
 

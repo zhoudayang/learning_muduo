@@ -31,11 +31,12 @@ const int Channel::kWriteEvent = POLLOUT;
 Channel::Channel(EventLoop *loop, int fdArg)
         : loop_(loop), fd_(fdArg), events_(0), revents_(0), index_(-1) {}
 
-//todo meaning what?
+//更新关注的事件，需要处理的事件... 等
 void Channel::update() {
     loop_->updateChannel(this);
 }
 
+//处理回调的事件请求
 void Channel::handleEvent() {
     //POLLNVAL is equivalent to EBADF: it means the file descriptor does not actually refer to any open file,
     // i.e. it was closed or never open to begin with. This can never happen except as a result of a programming error or intentional attempt to query whether a file descriptor is invalid.
