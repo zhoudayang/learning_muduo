@@ -61,6 +61,7 @@ void Poller::updateChannel(Channel *channel) {
         assert(channels_.find(channel->fd()) == channels_.end());
         struct pollfd pfd;
         pfd.fd = channel->fd();
+        pfd.events = static_cast<short>(channel->events());
         pfd.revents = 0;
         pollfds_.push_back(pfd);
         int idx = static_cast<int>(pollfds_.size()) - 1;

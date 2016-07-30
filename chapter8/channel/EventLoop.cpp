@@ -56,7 +56,7 @@ void EventLoop::quit() {
     quit_ = true;
 }
 
-void EventLoop::updateChannel(Channel *channel) {
+void EventLoop::updateChannel(Channel *channel){
     assert(channel->ownerLoop() == this);
     assertInLoopThread();
     poller_->updateChannel(channel);
