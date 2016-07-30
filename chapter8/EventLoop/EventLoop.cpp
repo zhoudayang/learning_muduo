@@ -12,7 +12,7 @@ using namespace muduo;
 __thread EventLoop *t_loopInThisThread = 0;
 
 EventLoop::EventLoop() : looping_(false), threadId_(CurrentThread::tid()) {
-    printf("EventLoop created %p in thread \n", threadId_);
+    printf("EventLoop created in thread %d \n", threadId_);
     if (t_loopInThisThread) {
         printf("Another EventLoop %p exists in this thread %ld \n", t_loopInThisThread, threadId_);
     } else {
@@ -29,12 +29,15 @@ void EventLoop::loop() {
     assert(!looping_);
     assertInLoopThread();
     looping_ = true;
+    // only wait 5 seconds
     ::poll(NULL, 0, 5 * 1000);
     printf("EventLoop %p stop looping\n", t_loopInThisThread);
     looping_ = false;
 }
 
 void EventLoop::abortNotInloopThread() {
-    printf("EventLoop::abortNotInloopThread -EventLoop %p was created in threadId_ = %ld ,current thread id = %ld",
+    printf("EventLoop::abortNotInloopThread -EventLoop %p was created in threadId_ = %u ,current thread id = %ld",
            this, threadId_, CurrentThread::tid());
+    //abort now
+    abort();
 }
