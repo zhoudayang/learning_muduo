@@ -61,7 +61,6 @@ void worker2() {
     }
     test.countDown();
     sleep(1);
-    test.countDown();
     {
         lock_guard<mutex> lock(print_lock);
         cout << "worker 2 complete" << endl;
