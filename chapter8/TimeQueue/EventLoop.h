@@ -70,9 +70,5 @@ namespace muduo {
 }
 
 
-class EventLoop {
-
-};
-
 
 #endif //TIMEQUEUE_EVENTLOOP_H

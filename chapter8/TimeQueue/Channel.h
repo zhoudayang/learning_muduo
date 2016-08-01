@@ -68,7 +68,7 @@ namespace muduo {
 
         static const int kNoneEvent;
         static const int kReadEvent;
-        static const int kWriteevent;
+        static const int kWriteEvent;
 
         EventLoop *loop_;
         const int fd_;

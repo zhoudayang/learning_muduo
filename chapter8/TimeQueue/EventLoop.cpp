@@ -15,7 +15,7 @@ __thread EventLoop *t_loopInThisThread = 0;
 const int kPollTimeMs = 10000;
 
 EventLoop::EventLoop() : looping_(false), quit_(false), threadId_(CurrentThread::tid()), poller_(new Poller(this)),
-                         TimerQueue(new TimerQueue(this)) {
+                         timerQueue_(new TimerQueue(this)) {
     printf("EventLoop created\n");
     if (t_loopInThisThread) {
         printf("Another EventLoop thread %p existd in this thread %u", t_loopInThisThread, threadId_);
@@ -37,7 +37,7 @@ void EventLoop::loop() {
     quit_ = false;
     while (!quit_) {
         activeChannels_.clear();
-        PollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
+        pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
         for (ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); it++) {
             (*it)->handleEvent();
         }
@@ -52,7 +52,7 @@ void EventLoop::quit() {
 }
 
 TimerId EventLoop::runAt(const Timestamp &time, const TimerCallback &cb) {
-    return timerQueue_->addTimer(cb,timer,0.0);
+    return timerQueue_->addTimer(cb,time,0.0);
 }
 
 TimerId EventLoop::runEvery(double interval, const TimerCallback &cb) {
@@ -63,6 +63,6 @@ TimerId EventLoop::runEvery(double interval, const TimerCallback &cb) {
 void EventLoop::updateChannel(Channel *channel) {
     assert(channel->ownerLoop()==this);
     assertInLoopThread();
-    poller_->updateChannel(channel_);
+    poller_->updateChannel(channel);
 
 }
