@@ -39,8 +39,10 @@ void EventLoop::loop() {
     looping_ = true;
     quit_ = false;
     while (!quit_) {
+        //清空activeChannels_
         activeChannels_.clear();
         pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
+        //调用回调函数
         for (ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); it++) {
             (*it)->handleEvent();
         }
@@ -60,6 +62,7 @@ TimerId EventLoop::runAt(const Timestamp &time, const TimerCallback &cb) {
 
 TimerId EventLoop::runAfter(double delay, const TimerCallback &cb) {
     Timestamp time(addTime(Timestamp::now(), delay));
+    //在time这一时刻运行
     return runAt(time, cb);
 }
 
@@ -68,6 +71,7 @@ TimerId EventLoop::runEvery(double interval, const TimerCallback &cb) {
     return timerQueue_->addTimer(cb, time, interval);
 }
 
+//更新channel关注的事件　或者插入新的channel
 void EventLoop::updateChannel(Channel *channel) {
     assert(channel->ownerLoop() == this);
     assertInLoopThread();

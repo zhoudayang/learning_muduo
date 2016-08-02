@@ -12,11 +12,13 @@
 namespace muduo {
     class Timer : boost::noncopyable {
     public:
+        //if interval >0.0 means run every interval
         Timer(const TimerCallback &cb, Timestamp when, double interval)
                 : callback_(cb), expiration_(when), interval_(interval), repeat_(interval_ > 0.0) {
 
         }
 
+        //runs callback function
         void run() const {
             callback_();
         }

@@ -4,9 +4,11 @@
 
 #ifndef TIMERID_H
 #define TIMERID_H
+
 namespace muduo {
     class Timer;
 
+    //存放Timer对象的指针
     class TimerId {
     public:
         explicit TimerId(Timer *timer) : value_(timer) {}

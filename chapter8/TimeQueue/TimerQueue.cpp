@@ -2,8 +2,6 @@
 // Created by zhouyang on 16/8/1.
 //
 
-
-
 #include "TimerQueue.h"
 #include "EventLoop.h"
 #include "Timer.h"
@@ -27,7 +25,9 @@ namespace muduo {
             if (microsecond < 100)
                 microsecond = 100;
             struct timespec ts;
+            //second
             ts.tv_sec = static_cast<time_t> (microsecond / Timestamp::kMicroSecondsPerSecond);
+            //ns
             ts.tv_nsec = static_cast<long> ((microsecond % Timestamp::kMicroSecondsPerSecond) * 1000);
             return ts;
 
@@ -48,19 +48,18 @@ namespace muduo {
             bzero(&newValue, sizeof newValue);
             bzero(&oldValue, sizeof oldValue);
             newValue.it_value = howMuchTimeFromNow(expiration);
+            //用来启动或者关闭fd指定的定时器
             int ret = ::timerfd_settime(timerfd, 0, &newValue, &oldValue);
             if (ret) {
                 printf("timerfd_settime\n");
-
             }
-
         }
     }
 }
 
 using namespace muduo;
 using namespace muduo::detail;
-
+                                                     //create timerfd
 TimerQueue::TimerQueue(EventLoop *loop) : loop_(loop), timerfd_(createTimerFd()), timerfdChannel_(loop, timerfd_),
                                           timers_() {
     timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead, this));
@@ -69,6 +68,7 @@ TimerQueue::TimerQueue(EventLoop *loop) : loop_(loop), timerfd_(createTimerFd())
 
 TimerQueue::~TimerQueue() {
     ::close(timerfd_);
+    //desctruct every elem of timers_
     for (TimerList::iterator it = timers_.begin(); it != timers_.end(); it++) {
         delete it->second;
     }
@@ -90,6 +90,7 @@ void TimerQueue::handleRead() {
     readTimerfd(timerfd_, now);
     std::vector<Entry> expired = getExpired(now);
     for (std::vector<Entry>::iterator it = expired.begin(); it != expired.end(); it++) {
+        //call callback function
         it->second->run();
     }
     reset(expired, now);
@@ -97,10 +98,14 @@ void TimerQueue::handleRead() {
 
 std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now) {
     std::vector<Entry> expired;
+    //sentry is <now,max_ptr> pair
     Entry sentry = std::make_pair(now, reinterpret_cast<Timer *>(UINTPTR_MAX));
     TimerList::iterator it = timers_.lower_bound(sentry);
+    //it指向的是第一个未到期的Timer迭代器，这个迭代器指向的对象的时间必定大于now
     assert(it == timers_.end() or now < it->first);
+    //将这一段已经到期的Entry复制到expired中去
     std::copy(timers_.begin(), it, std::back_inserter(expired));
+    //将已经到期的Entry从timers_中删除
     timers_.erase(timers_.begin(), it);
     return expired;
 
@@ -110,14 +115,17 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
     Timestamp nextExpire;
     for (std::vector<Entry>::const_iterator it = expired.begin(); it != expired.end(); it++) {
         if (it->second->repeat()) {
+            //change expiration to now + interval
             it->second->restart(now);
             insert(it->second);
         }
         else {
+            //don't repleat,destruct Timer
             delete it->second;
         }
     }
     if (!timers_.empty()) {
+        //nextExpire time is the first elem of timers_
         nextExpire = timers_.begin()->second->expiration();
     }
     if (nextExpire.valid()) {
@@ -132,7 +140,9 @@ bool TimerQueue::insert(Timer *timer) {
     if (it == timers_.end() || when < it->first) {
         earliestChanged = true;
     }
+    //最早到期的timer发生了改变
     std::pair<TimerList::iterator, bool> result = timers_.insert(std::make_pair(when, timer));
+    //assert result.second is not NULL
     assert(result.second);
     return earliestChanged;
 }

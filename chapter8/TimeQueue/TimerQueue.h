@@ -32,6 +32,7 @@ namespace muduo {
         TimerId addTimer(const TimerCallback &cb, Timestamp when, double interval);
 
     private:
+        //设置key为<Timestamp,Timer *> 这样即便时间相同，他们的地址也会不同
         typedef std::pair<Timestamp, Timer *> Entry;
         typedef std::set<Entry> TimerList;
 
@@ -51,6 +52,7 @@ namespace muduo {
         Channel timerfdChannel_;
         //Timer list sorted by expiration
         //只有key 没有value
+        //Timer list sorted by expiration
         TimerList timers_;
 
     };

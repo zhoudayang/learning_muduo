@@ -22,53 +22,64 @@ namespace muduo {
         Channel(EventLoop *loop, int fd);
 
         void handleEvent();
-
+        //set read callback
         void setReadCallback(const EventCallback &cb) {
             readCallback_ = cb;
         }
-
+        //set write call back
         void setWriteCallback(const EventCallback &cb) {
             writeCallback_ = cb;
         }
-
+        //set error callback
         void setErrorCallback(const EventCallback &cb) {
             errorCallback_ = cb;
         }
 
+        //return file description
         int fd() {
             return fd_;
         }
 
+        //return events that cares about
         int events() const {
             return events_;
         }
 
+        //set revents_
         void set_revents(int revt) {
             revents_ = revt;
         }
 
+        // if it is noneEvent
         bool isNoneEvent() const {
             return events_ == kNoneEvent;
         }
 
+        //now cares about reading event
         void enableReading() {
             events_ |= kReadEvent;
+            //关注的事件有变，需要更新Poller中的pollfds_
             update();
         }
 
+        //now cares about writing event
         void enableWriting() {
             events_ |= kWriteEvent;
+            //关注的事件有变，需要更新Poller中的pollfds_
             update();
         }
 
+        //return index
         int index() {
             return index_;
         }
 
+        //set index
         void set_index(int idx) {
             index_ = idx;
         }
 
+        //return owner EventLoop
         EventLoop *ownerLoop() {
             return loop_;
         }
@@ -81,13 +92,20 @@ namespace muduo {
         static const int kReadEvent;
 
         EventLoop *loop_;
+        //file description to pull
         const int fd_;
+        //types of events that cares about
         int events_;
+        //types of events that actually occured
         int revents_;
+        //used by Poller,the index of pollfds_ in Poller
         int index_;
 
+        //read callback function
         EventCallback readCallback_;
+        //write callback function
         EventCallback writeCallback_;
+        //error callback function
         EventCallback errorCallback_;
     };
 
