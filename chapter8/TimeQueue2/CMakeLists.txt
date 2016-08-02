@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.5)
+project(TimeQueue)
+find_package(Threads)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(SOURCE_FILES main.cpp datetime/Timestamp.cc Atomic.h Callbacks.h Timer.cpp TimerId.h Thread.cpp EventLoop.cpp Poller.cpp Channel.cpp TimerQueue.cpp)
+add_executable(main ${SOURCE_FILES})
+target_link_libraries(main ${CMAKE_THREAD_LIBS_INIT})
