@@ -4,13 +4,13 @@
 
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
-
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "datetime/Timestamp.h"
 
-namespace muduo {
+namespace muduo{
     typedef boost::function<void()> TimerCallback;
 }
+
 #endif

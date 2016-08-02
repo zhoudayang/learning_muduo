@@ -7,6 +7,8 @@
 #include "Poller.h"
 #include "TimerQueue.h"
 
+#include <stdio.h>
+
 #include <assert.h>
 
 using namespace muduo;
@@ -16,13 +18,14 @@ const int kPollTimeMs = 10000;
 
 EventLoop::EventLoop() : looping_(false), quit_(false), threadId_(CurrentThread::tid()), poller_(new Poller(this)),
                          timerQueue_(new TimerQueue(this)) {
-    printf("EventLoop created\n");
+    printf("EventLoop created %p in thread %u \n", this, threadId_);
+    //是否有其他的EventLoop 绑定到这个线程
     if (t_loopInThisThread) {
         printf("Another EventLoop thread %p existd in this thread %u", t_loopInThisThread, threadId_);
 
     }
     else
-        t_loopInThisThread = false;
+        t_loopInThisThread = this;
 }
 
 EventLoop::~EventLoop() {
@@ -41,9 +44,9 @@ void EventLoop::loop() {
         for (ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); it++) {
             (*it)->handleEvent();
         }
-        printf("EventLoop %p stop looping\n", this);
-        looping_ = false;
     }
+    printf("EventLoop %p stop looping\n", this);
+    looping_ = false;
 }
 
 
@@ -52,17 +55,28 @@ void EventLoop::quit() {
 }
 
 TimerId EventLoop::runAt(const Timestamp &time, const TimerCallback &cb) {
-    return timerQueue_->addTimer(cb,time,0.0);
+    return timerQueue_->addTimer(cb, time, 0.0);
+}
+
+TimerId EventLoop::runAfter(double delay, const TimerCallback &cb) {
+    Timestamp time(addTime(Timestamp::now(), delay));
+    return runAt(time, cb);
 }
 
 TimerId EventLoop::runEvery(double interval, const TimerCallback &cb) {
-    Timestamp time(addTime(Timestamp::now(),interval));
-    return timerQueue_->addTimer(cb,time,interval);
+    Timestamp time(addTime(Timestamp::now(), interval));
+    return timerQueue_->addTimer(cb, time, interval);
 }
 
 void EventLoop::updateChannel(Channel *channel) {
-    assert(channel->ownerLoop()==this);
+    assert(channel->ownerLoop() == this);
     assertInLoopThread();
     poller_->updateChannel(channel);
 
+}
+
+void EventLoop::abortNotInLoopThread() {
+    printf("EventLoop::abortNotInLoopThread - EventLoop %p was created in threadId_= %u ,current thread id = %u\n",
+           this, threadId_, CurrentThread::tid());
+    abort();
 }

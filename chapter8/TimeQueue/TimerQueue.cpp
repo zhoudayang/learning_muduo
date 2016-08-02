@@ -64,7 +64,7 @@ using namespace muduo::detail;
 
 TimerQueue::TimerQueue(EventLoop *loop):loop_(loop),timerfd_(createTimerFd()),timerfdChannel_(loop,timerfd_) ,timers_(){
     timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead,this));
-    timerfdChannel_.eableReading();
+    timerfdChannel_.enableReading();
 }
 
 TimerQueue::~TimerQueue() {

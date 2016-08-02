@@ -11,15 +11,6 @@
 
 using namespace muduo;
 
-// add for osx support
-#ifdef __APPLE__
-#define _DARWIN_C_SOURCE
-#endif
-#ifndef POLLRDHUP
-#define POLLRDHUP 0x2000
-#endif
-// add for osx support
-
 const int Channel::kNoneEvent = 0;
 const int Channel::kReadEvent = POLLIN | POLLPRI;
 const int Channel::kWriteEvent = POLLOUT;
@@ -32,17 +23,21 @@ void Channel::update() {
 }
 
 void Channel::handleEvent() {
+    //an error happened
     if (revents_ & POLLNVAL) {
         printf("Channel::handle_events() POLLNVAL\n");
     }
+    //call error handler
     if (revents_ & (POLLERR | POLLNVAL)) {
         if (errorCallback_)
             errorCallback_();
     }
+    //call read callback
     if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
         if (readCallback_)
             readCallback_();
     }
+    //call write callback
     if (revents_ & POLLOUT) {
         if (writeCallback_)
             writeCallback_();

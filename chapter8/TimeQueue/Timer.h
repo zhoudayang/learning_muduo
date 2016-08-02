@@ -29,7 +29,7 @@ namespace muduo {
             return repeat_;
         }
 
-        void restart(Timestamp noe);
+        void restart(Timestamp now);
 
     private:
         const TimerCallback callback_;

@@ -7,10 +7,15 @@
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
-#include "EventLoop.h"
 
 namespace muduo {
-    class Channel {
+    class EventLoop;
+
+    //A selection io channle
+    //this class doesn't own the file descriptor
+    //the file descriptor could be a socket
+    //an eventfd , a timerfd or signalfd
+    class Channel : boost::noncopyable {
     public:
         typedef boost::function<void()> EventCallback;
 
@@ -22,15 +27,15 @@ namespace muduo {
             readCallback_ = cb;
         }
 
+        void setWriteCallback(const EventCallback &cb) {
+            writeCallback_ = cb;
+        }
+
         void setErrorCallback(const EventCallback &cb) {
             errorCallback_ = cb;
         }
 
-        void setWriteCallback(const EventCallback &cb) {
-            errorCallback_ = cb;
-        }
-
-        int fd() const {
+        int fd() {
             return fd_;
         }
 
@@ -38,20 +43,25 @@ namespace muduo {
             return events_;
         }
 
-        void set_events(int recv) {
-            revents_ = recv;
+        void set_revents(int revt) {
+            revents_ = revt;
         }
 
-        bool isNonoEvent() const {
+        bool isNoneEvent() const {
             return events_ == kNoneEvent;
         }
 
-        void eableReading() {
+        void enableReading() {
             events_ |= kReadEvent;
             update();
         }
 
-        int index() const {
+        void enableWriting() {
+            events_ |= kWriteEvent;
+            update();
+        }
+
+        int index() {
             return index_;
         }
 
@@ -67,19 +77,20 @@ namespace muduo {
         void update();
 
         static const int kNoneEvent;
-        static const int kReadEvent;
         static const int kWriteEvent;
+        static const int kReadEvent;
 
         EventLoop *loop_;
         const int fd_;
         int events_;
         int revents_;
         int index_;
+
         EventCallback readCallback_;
         EventCallback writeCallback_;
         EventCallback errorCallback_;
-
     };
+
 }
 
 

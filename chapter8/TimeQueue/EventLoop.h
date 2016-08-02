@@ -30,14 +30,21 @@ namespace muduo {
 
         void quit();
 
+        //time when poll returns,usually means data arrival.
         Timestamp pollReturnTime() const {
             return pollReturnTime_;
         }
 
+        //run callback at time
         TimerId runAt(const Timestamp &time, const TimerCallback &cb);
 
+        //run callback after delay seconds
+        TimerId runAfter(double delay, const TimerCallback &cb);
+
+        // run callback every interval seconds
         TimerId runEvery(double interval, const TimerCallback &cb);
 
+        //internal use only
         void updateChannel(Channel *channel);
 
         bool isInLoopThread() const {
@@ -68,7 +75,6 @@ namespace muduo {
 
 
 }
-
 
 
 #endif //TIMEQUEUE_EVENTLOOP_H

@@ -38,7 +38,7 @@ void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) cons
             assert(ch != channels_.end());
             Channel *channel = ch->second;
             assert(channel->fd() == pfd->fd);
-            channel->set_events(pfd->revents);
+            channel->set_revents(pfd->revents);
             activeChannels->push_back(channel);
 
         }
@@ -68,7 +68,7 @@ void Poller::updateChannel(Channel *channel) {
         assert(pfd.fd == channel->fd() || pfd.fd == -1);
         pfd.events = static_cast<short>(channel->events());
         pfd.revents = 0;
-        if (channel->isNonoEvent())
+        if (channel->isNoneEvent())
             pfd.fd = -1;
     }
 }
