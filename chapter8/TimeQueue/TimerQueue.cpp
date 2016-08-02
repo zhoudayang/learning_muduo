@@ -5,7 +5,6 @@
 
 
 #include "TimerQueue.h"
-#include "TimerQueue.h"
 #include "EventLoop.h"
 #include "Timer.h"
 #include "TimerId.h"
@@ -29,7 +28,7 @@ namespace muduo {
                 microsecond = 100;
             struct timespec ts;
             ts.tv_sec = static_cast<time_t> (microsecond / Timestamp::kMicroSecondsPerSecond);
-            ts.tv_nsec = static_cast<long> (microsecond % Timestamp::kMicroSecondsPerSecond);
+            ts.tv_nsec = static_cast<long> ((microsecond % Timestamp::kMicroSecondsPerSecond) * 1000);
             return ts;
 
         }
@@ -62,24 +61,25 @@ namespace muduo {
 using namespace muduo;
 using namespace muduo::detail;
 
-TimerQueue::TimerQueue(EventLoop *loop):loop_(loop),timerfd_(createTimerFd()),timerfdChannel_(loop,timerfd_) ,timers_(){
-    timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead,this));
+TimerQueue::TimerQueue(EventLoop *loop) : loop_(loop), timerfd_(createTimerFd()), timerfdChannel_(loop, timerfd_),
+                                          timers_() {
+    timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead, this));
     timerfdChannel_.enableReading();
 }
 
 TimerQueue::~TimerQueue() {
     ::close(timerfd_);
-    for(TimerList::iterator it = timers_.begin();it != timers_.end();it++){
+    for (TimerList::iterator it = timers_.begin(); it != timers_.end(); it++) {
         delete it->second;
     }
 }
 
 TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double interval) {
-    Timer * timer = new Timer(cb,when,interval);
+    Timer *timer = new Timer(cb, when, interval);
     loop_->assertInLoopThread();
     bool earliestChanged = insert(timer);
-    if(earliestChanged){
-        resetTimerfd(timerfd_,timer->expiration());
+    if (earliestChanged) {
+        resetTimerfd(timerfd_, timer->expiration());
     }
     return TimerId(timer);
 }
@@ -87,52 +87,52 @@ TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double int
 void TimerQueue::handleRead() {
     loop_->assertInLoopThread();
     Timestamp now(Timestamp::now());
-    readTimerfd(timerfd_,now);
+    readTimerfd(timerfd_, now);
     std::vector<Entry> expired = getExpired(now);
-    for(std::vector<Entry>::iterator it = expired.begin();it != expired.end();it++){
+    for (std::vector<Entry>::iterator it = expired.begin(); it != expired.end(); it++) {
         it->second->run();
     }
-    reset(expired,now);
+    reset(expired, now);
 }
 
-std::vector <TimerQueue::Entry> TimerQueue::getExpired(Timestamp now) {
-    std::vector <Entry> expired;
+std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now) {
+    std::vector<Entry> expired;
     Entry sentry = std::make_pair(now, reinterpret_cast<Timer *>(UINTPTR_MAX));
-    TimerList ::iterator it = timers_.lower_bound(sentry);
-    assert(it==timers_.end() or now<it->first);
-    std::copy(timers_.begin(),it,std::back_inserter(expired));
-    timers_.erase(timers_.begin(),it);
+    TimerList::iterator it = timers_.lower_bound(sentry);
+    assert(it == timers_.end() or now < it->first);
+    std::copy(timers_.begin(), it, std::back_inserter(expired));
+    timers_.erase(timers_.begin(), it);
     return expired;
 
 }
 
 void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
     Timestamp nextExpire;
-    for(std::vector<Entry>::const_iterator it = expired.begin();it!=expired.end();it++){
-        if(it->second->repeat()){
+    for (std::vector<Entry>::const_iterator it = expired.begin(); it != expired.end(); it++) {
+        if (it->second->repeat()) {
             it->second->restart(now);
             insert(it->second);
         }
-        else{
+        else {
             delete it->second;
         }
     }
-    if(!timers_.empty()){
-        nextExpire=timers_.begin()->second->expiration();
+    if (!timers_.empty()) {
+        nextExpire = timers_.begin()->second->expiration();
     }
-    if(nextExpire.valid()){
-        resetTimerfd(timerfd_,nextExpire);
+    if (nextExpire.valid()) {
+        resetTimerfd(timerfd_, nextExpire);
     }
 }
 
 bool TimerQueue::insert(Timer *timer) {
     bool earliestChanged = false;
     Timestamp when = timer->expiration();
-    TimerList ::iterator it = timers_.begin();
-    if(it==timers_.end()||when<it->first){
-        earliestChanged=true;
+    TimerList::iterator it = timers_.begin();
+    if (it == timers_.end() || when < it->first) {
+        earliestChanged = true;
     }
-    std::pair<TimerList::iterator,bool> result = timers_.insert(std::make_pair(when,timer));
+    std::pair<TimerList::iterator, bool> result = timers_.insert(std::make_pair(when, timer));
     assert(result.second);
     return earliestChanged;
 }

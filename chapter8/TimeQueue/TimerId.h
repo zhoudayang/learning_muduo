@@ -9,7 +9,7 @@ namespace muduo {
 
     class TimerId {
     public:
-        explicit TimerId(Timer *timer) : value_(timer) { }
+        explicit TimerId(Timer *timer) : value_(timer) {}
         //default copy-ctor dtor and assignment are okay
     private:
         Timer *value_;
