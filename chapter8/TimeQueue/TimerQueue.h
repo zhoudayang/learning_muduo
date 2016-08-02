@@ -48,9 +48,8 @@ namespace muduo {
 
         EventLoop *loop_;
         const int timerfd_;
-        //
+        //timerfdChannel_
         Channel timerfdChannel_;
-        //Timer list sorted by expiration
         //只有key 没有value
         //Timer list sorted by expiration
         TimerList timers_;

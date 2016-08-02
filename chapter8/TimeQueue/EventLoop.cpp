@@ -57,6 +57,7 @@ void EventLoop::quit() {
 }
 
 TimerId EventLoop::runAt(const Timestamp &time, const TimerCallback &cb) {
+    //增加定时器
     return timerQueue_->addTimer(cb, time, 0.0);
 }
 
@@ -68,6 +69,7 @@ TimerId EventLoop::runAfter(double delay, const TimerCallback &cb) {
 
 TimerId EventLoop::runEvery(double interval, const TimerCallback &cb) {
     Timestamp time(addTime(Timestamp::now(), interval));
+    //interval is not null,repeat is true
     return timerQueue_->addTimer(cb, time, interval);
 }
 

@@ -20,6 +20,7 @@ namespace muduo {
             return timerfd;
         }
 
+        //calculate how much time from when and now
         struct timespec howMuchTimeFromNow(Timestamp when) {
             int64_t microsecond = when.microSecondsSinceEpoch() - Timestamp::now().microSecondsSinceEpoch();
             if (microsecond < 100)
@@ -36,19 +37,21 @@ namespace muduo {
         void readTimerfd(int timerfd, Timestamp now) {
             uint64_t howmany;
             ssize_t n = ::read(timerfd, &howmany, sizeof howmany);
+            //输出触发了几个定时器事件
             printf("TimerQueue::handleRead() %ld at %s \n", howmany, now.toString().c_str());
             if (n != sizeof howmany) {
                 printf("TimerQueue::handleRead reads %d bytes instead of 8 \n ", n);
             }
         }
 
+        //reset 定时器
         void resetTimerfd(int timerfd, Timestamp expiration) {
             struct itimerspec newValue;
             struct itimerspec oldValue;
             bzero(&newValue, sizeof newValue);
             bzero(&oldValue, sizeof oldValue);
             newValue.it_value = howMuchTimeFromNow(expiration);
-            //用来启动或者关闭fd指定的定时器
+            //用来启动或者关闭fd指定的定时器　设置定时器在expiration报警
             int ret = ::timerfd_settime(timerfd, 0, &newValue, &oldValue);
             if (ret) {
                 printf("timerfd_settime\n");
@@ -59,9 +62,12 @@ namespace muduo {
 
 using namespace muduo;
 using namespace muduo::detail;
-                                                     //create timerfd
+
+//create timerfd
 TimerQueue::TimerQueue(EventLoop *loop) : loop_(loop), timerfd_(createTimerFd()), timerfdChannel_(loop, timerfd_),
                                           timers_() {
+    //  新建定时器　新建和定时器挂钩的channel
+    // 设置handleRead 为　定时器事件触发时调用的回调函数
     timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead, this));
     timerfdChannel_.enableReading();
 }
@@ -78,17 +84,21 @@ TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double int
     Timer *timer = new Timer(cb, when, interval);
     loop_->assertInLoopThread();
     bool earliestChanged = insert(timer);
+    //最早报警的定时器发生变化，重新设置定时器
     if (earliestChanged) {
         resetTimerfd(timerfd_, timer->expiration());
     }
     return TimerId(timer);
 }
 
+//主调用入口函数
 void TimerQueue::handleRead() {
     loop_->assertInLoopThread();
     Timestamp now(Timestamp::now());
     readTimerfd(timerfd_, now);
     std::vector<Entry> expired = getExpired(now);
+    //这里已经将过期的timer从timers_中删除了，将这些需要删除的timer返回
+    //调用时间回调函数
     for (std::vector<Entry>::iterator it = expired.begin(); it != expired.end(); it++) {
         //call callback function
         it->second->run();
@@ -117,6 +127,7 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
         if (it->second->repeat()) {
             //change expiration to now + interval
             it->second->restart(now);
+            //将需要重复运行的timer再次加入timers_中去
             insert(it->second);
         }
         else {
