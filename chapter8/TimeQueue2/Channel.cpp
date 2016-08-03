@@ -5,14 +5,14 @@
 #include "Channel.h"
 #include "EventLoop.h"
 
-#include <sstream>
-
 #include <poll.h>
 
 using namespace muduo;
-
+//cares about nothing
 const int Channel::kNoneEvent = 0;
+//cares about read event
 const int Channel::kReadEvent = POLLIN | POLLPRI;
+//cares about write event
 const int Channel::kWriteEvent = POLLOUT;
 
 Channel::Channel(EventLoop *loop, int fd)

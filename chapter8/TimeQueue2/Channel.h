@@ -68,6 +68,15 @@ namespace muduo {
             //关注的事件有变，需要更新Poller中的pollfds_
             update();
         }
+        void disableWriting(){
+            events_ &=~kWriteEvent;
+            update();
+        }
+        void disableAll(){
+            events_=kNoneEvent;
+            update();
+        }
+
 
         //return index
         int index() {

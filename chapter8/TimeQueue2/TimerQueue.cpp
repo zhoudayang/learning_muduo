@@ -13,6 +13,7 @@
 
 namespace muduo {
     namespace detail {
+        //create timer file descriptor
         int createTimerFd() {
             int timerfd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
             if (timerfd < 0)
@@ -34,6 +35,7 @@ namespace muduo {
 
         }
 
+        //only for print info
         void readTimerfd(int timerfd, Timestamp now) {
             uint64_t howmany;
             ssize_t n = ::read(timerfd, &howmany, sizeof howmany);
@@ -46,6 +48,7 @@ namespace muduo {
 
         //reset 定时器
         void resetTimerfd(int timerfd, Timestamp expiration) {
+            //wake up by timerfd_settime()
             struct itimerspec newValue;
             struct itimerspec oldValue;
             bzero(&newValue, sizeof newValue);
@@ -69,6 +72,7 @@ TimerQueue::TimerQueue(EventLoop *loop) : loop_(loop), timerfd_(createTimerFd())
     //  新建定时器　新建和定时器挂钩的channel
     // 设置handleRead 为　定时器事件触发时调用的回调函数
     timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead, this));
+    // we are always reading the timerfd, we disarm it with timerfd_settime.
     timerfdChannel_.enableReading();
 }
 
@@ -80,17 +84,22 @@ TimerQueue::~TimerQueue() {
     }
 }
 
+//here change
 TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double interval) {
     Timer *timer = new Timer(cb, when, interval);
     loop_->assertInLoopThread();
-    bool earliestChanged = insert(timer);
-    //最早报警的定时器发生变化，重新设置定时器
-    if (earliestChanged) {
-        resetTimerfd(timerfd_, timer->expiration());
-    }
+    loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop,this,timer));
     return TimerId(timer);
 }
 
+//add this function
+void TimerQueue::addTimerInLoop(Timer *timer) {
+    loop_->assertInLoopThread();
+    bool earliestChanged = insert(timer);
+    if(earliestChanged){
+        resetTimerfd(timerfd_,timer->expiration());
+    }
+}
 //主调用入口函数
 void TimerQueue::handleRead() {
     loop_->assertInLoopThread();

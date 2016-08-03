@@ -36,6 +36,8 @@ namespace muduo {
         typedef std::pair<Timestamp, Timer *> Entry;
         typedef std::set<Entry> TimerList;
 
+        void addTimerInLoop(Timer * timer);
+
         //call when  timerfd alarms
         void handleRead();
 

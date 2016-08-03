@@ -8,6 +8,7 @@
 namespace muduo {
     class Timer;
 
+    //an opaque identifier, for canceling timer
     //存放Timer对象的指针
     class TimerId {
     public:

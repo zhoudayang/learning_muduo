@@ -31,11 +31,14 @@ namespace muduo {
 
         ~EventLoop();
 
+
+        //loop forever
+        //must be called in same thread as creation of object
         void loop();
 
         void quit();
 
-        //time when poll returns,usually means data arrival.
+        //time when poll returns, usually means data arrival.
         Timestamp pollReturnTime() const {
             return pollReturnTime_;
         }
@@ -95,8 +98,10 @@ namespace muduo {
         boost::scoped_ptr<Poller> poller_;
         boost::scoped_ptr<TimerQueue> timerQueue_;
         ChannelList activeChannels_;
-
+        int wakeupFd_;
         bool callingPendingFunctors_;
+        //unlike in TimeQueue, which is an internal class
+        //we don't expose channel to client
         boost::scoped_ptr<Channel >wakeupChannel_;
         std::mutex mutex_;
         std::vector<Functor> PendingFunctors_;

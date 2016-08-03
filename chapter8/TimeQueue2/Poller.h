@@ -16,6 +16,7 @@ struct pollfd;
 namespace muduo {
     class Channel;
 
+    //this class doesn;t own the Channel objects
     class Poller : boost::noncopyable {
     public:
         typedef std::vector<Channel *> ChannelList;
@@ -24,8 +25,11 @@ namespace muduo {
 
         ~Poller();
 
+        //polls the IO events
+        //must be called in the loop thread
         Timestamp poll(int timeoutMs, ChannelList *activeChannels);
 
+        //changes the interestd io events
         void updateChannel(Channel *channel);
 
         void assertInLoopThread() {
@@ -39,6 +43,7 @@ namespace muduo {
 
         typedef std::vector<struct pollfd> PollFdList;
         typedef std::map<int, Channel *> ChannelMap;
+
         EventLoop *ownerLoop_;
         PollFdList pollfds_;;
         ChannelMap channels_;

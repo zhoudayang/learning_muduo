@@ -23,20 +23,27 @@ namespace muduo {
             callback_();
         }
 
+        //return timestamp when timer expire to alarm
         Timestamp expiration() const {
             return expiration_;
         }
 
+        //repeat after timer alarms ?
         bool repeat() const {
             return repeat_;
         }
 
+        //reset expiration_, called when repeat
         void restart(Timestamp now);
 
     private:
+        //callback function
         const TimerCallback callback_;
+        //timestamp when timer should alarm
         Timestamp expiration_;
+        //repeat interval
         const double interval_;
+        //if should repeat when timer alarm
         const bool repeat_;
     };
 

@@ -20,6 +20,7 @@ Timestamp Poller::poll(int timeoutMs, ChannelList *activeChannels) {
     Timestamp now(Timestamp::now());
     if (numEvents > 0) {
         printf("%d events happended\n", numEvents);
+        //fill active events into activeChannels
         fillActiveChannels(numEvents, activeChannels);
     }
     else if (numEvents == 0) {
@@ -39,6 +40,7 @@ void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) cons
             assert(ch != channels_.end());
             Channel *channel = ch->second;
             assert(channel->fd() == pfd->fd);
+            //events happended , set revents_
             channel->set_revents(pfd->revents);
             //push channel to activeChannels
             activeChannels->push_back(channel);
@@ -47,7 +49,7 @@ void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) cons
     }
 }
 
-//将channel 加入poller，并且设置revents_为０
+//重置channels_ 设置新的events
 void Poller::updateChannel(Channel *channel) {
     assertInLoopThread();
     printf("fd = %d ,events = %d\n", channel->fd(), channel->events());

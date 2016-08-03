@@ -10,6 +10,7 @@
 #include "datetime/Timestamp.h"
 
 namespace muduo{
+    //an client visibke callbacks go here
     // 定时器绑定的回调函数
     typedef boost::function<void()> TimerCallback;
 }
