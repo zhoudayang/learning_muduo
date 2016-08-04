@@ -23,6 +23,8 @@ EventLoopThread::~EventLoopThread() {
 EventLoop* EventLoopThread::startLoop() {
     assert(!thread_.started());
     thread_.start();
+    //start thread before return loop
+    //wait loop to loop
     {
         unique_lock<mutex> lock(mutex_);
         while(loop_==NULL){
@@ -36,6 +38,7 @@ void EventLoopThread::threadFunc() {
     {
         unique_lock<mutex> lock(mutex_);
         loop_ = &loop;
+        //唤醒startLoop函数
         cond_.notify_one();
     }
     loop.loop();

@@ -12,7 +12,7 @@
 
 using std::mutex;
 using std::condition_variable;
-
+//IO线程不一定是主线程，也可以专门使用EventLoopThread用于处理IO
 namespace muduo{
     class EventLoop;
     class EventLoopThread:boost::noncopyable{
