@@ -13,6 +13,7 @@ void runInThread(){
 int main(){
     printf("main(): pid = %d,tid = %d\n",getpid(),muduo::CurrentThread::tid());
     muduo::EventLoopThread loopThread;
+    //init loop not in main thread
     muduo::EventLoop *loop = loopThread.startLoop();
     loop->runInLoop(runInThread);
     sleep(1);
@@ -20,6 +21,4 @@ int main(){
     sleep(3);
     loop->quit();
     printf("exit main(). \n");
-
-
 }
