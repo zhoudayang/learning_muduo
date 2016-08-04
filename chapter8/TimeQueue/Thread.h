@@ -33,8 +33,7 @@ namespace muduo {
     public:
         typedef boost::function<void()> ThreadFunc;
 
-        Thread(const ThreadFunc &func, const std::string &n);
-
+        Thread(const ThreadFunc &func, const std::string &n=std::string());
         ~Thread() {
             //分离线程，不再和此线程有任何联系
             if (started_ && !joined_) {
