@@ -98,8 +98,10 @@ namespace muduo {
         boost::scoped_ptr<Poller> poller_;
         boost::scoped_ptr<TimerQueue> timerQueue_;
         ChannelList activeChannels_;
+        //event fd
         int wakeupFd_;
         bool callingPendingFunctors_;
+
         //unlike in TimeQueue, which is an internal class
         //we don't expose channel to client
         boost::scoped_ptr<Channel >wakeupChannel_;
@@ -107,9 +109,7 @@ namespace muduo {
         std::vector<Functor> PendingFunctors_;
 
     };
-
-
 }
 
 
-#endif //TIMEQUEUE_EVENTLOOP_H
+#endif //EVENTLOOP_H

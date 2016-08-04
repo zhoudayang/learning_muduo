@@ -29,11 +29,12 @@ namespace muduo {
 }
 
 namespace muduo {
+    using std::string;
     class Thread : boost::noncopyable {
     public:
         typedef boost::function<void()> ThreadFunc;
-
-        Thread(const ThreadFunc &func, const std::string &n);
+        //set default value
+        Thread(const ThreadFunc &func, const string &n=string());
 
         ~Thread() {
             //分离线程，不再和此线程有任何联系

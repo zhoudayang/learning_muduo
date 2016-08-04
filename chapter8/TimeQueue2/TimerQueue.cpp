@@ -10,7 +10,10 @@
 #include <boost/bind.hpp>
 #include <sys/timerfd.h>
 
+//eventfd：实现了线程之间事件通知的方式，eventfd的缓冲区大小是sizeof(uint64_t)；
+// 向其write可以递增这个计数器，read操作可以读取，并进行清零
 
+//当有事件触发时，有可读事件发生。
 namespace muduo {
     namespace detail {
         //create timer file descriptor
@@ -87,7 +90,7 @@ TimerQueue::~TimerQueue() {
 //here change
 TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double interval) {
     Timer *timer = new Timer(cb, when, interval);
-    loop_->assertInLoopThread();
+    //changed here,add timer callback function to pendingFunctos_
     loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop,this,timer));
     return TimerId(timer);
 }
