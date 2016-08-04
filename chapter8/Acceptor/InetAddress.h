@@ -7,6 +7,7 @@
 
 #include <string>
 #include <netinet/in.h>
+#include <boost/noncopyable.hpp>
 
 namespace muduo {
     class InetAddress : boost::noncopyable {

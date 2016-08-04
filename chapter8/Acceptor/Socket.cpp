@@ -16,6 +16,9 @@ Socket::~Socket() {
     sockets::close(sockfd_);
 }
 
+void Socket::bindAddress(const InetAddress &addr) {
+    sockets::bindOrDie(sockfd_,addr.getSockAddrInet());
+}
 void Socket::listen() {
     sockets::listenOrDie(sockfd_);
 }

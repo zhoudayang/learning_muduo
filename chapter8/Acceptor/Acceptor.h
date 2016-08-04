@@ -30,7 +30,7 @@ namespace muduo {
             return listening_;
         }
 
-        void listen;
+        void listen();
 
     private:
         void handleRead();
