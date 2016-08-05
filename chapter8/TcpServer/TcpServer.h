@@ -1,5 +1,5 @@
 //
-// Created by fit on 16-8-5.
+// Created by zhouyang on 16-8-5.
 //
 
 #ifndef TCPSERVER_H
@@ -26,11 +26,11 @@ namespace muduo {
 
         void start();
 
-        void setConnectionCallback(ConnectionCallback &cb) {
+        void setConnectionCallback(const ConnectionCallback &cb) {
             connectionCallback_ = cb;
         }
 
-        void setMessageCallback(MessageCallback &cb) {
+        void setMessageCallback(const MessageCallback &cb) {
             messageCallback_ = cb;
         }
 
@@ -47,11 +47,7 @@ namespace muduo {
         bool started_;
         int nextConnId_;
         ConnectionMap connections_;
-
-
     };
-
-
 }
 
 

@@ -18,7 +18,9 @@ namespace muduo {
     class TcpConnection;
 
     typedef boost::shared_ptr<TcpConnection> TcpConnectionPtr;
+    //add connection callback function
     typedef boost::function<void(const TcpConnectionPtr &)> ConnectionCallback;
+    //add message call back function
     typedef boost::function<void(const TcpConnectionPtr &,
                                  const char *data,
                                  ssize_t len)> MessageCallback;

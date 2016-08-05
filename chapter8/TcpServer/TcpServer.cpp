@@ -1,5 +1,5 @@
 //
-// Created by fit on 16-8-5.
+// Created by zhouyang on 16-8-5.
 //
 
 #include "TcpServer.h"
@@ -19,6 +19,7 @@ TcpServer::TcpServer(EventLoop *loop, const InetAddress &listenAddr)
           acceptor_(new Acceptor(loop, listenAddr)),
           started_(false),
           nextConnId_(1) {
+    //set new Connection call back function to Acceptor
     acceptor_->setNewConnectionCallback(
             boost::bind(&TcpServer::newConnection, this, _1, _2));
 }
@@ -39,14 +40,19 @@ void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
     char buf[32];
     snprintf(buf, sizeof buf, "#%d", nextConnId_);
     ++nextConnId_;
+    //name_ host:port
     std::string connName = name_+ buf;
     printf("TcpServer::newConnection [%s] - new connection [%s] from %s \n", name_.c_str(), connName.c_str(),
            peerAddr.toHostPort().c_str());
     InetAddress localAddr(sockets::getLocalAddr(sockfd));
+    //create new TcpConnection
     TcpConnectionPtr conn(new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr));
+    //store relation between conn_name and conn
     connections_[connName] = conn;
+    //set callback functions
     conn->setConnectionCallback(connectionCallback_);
     conn->setMessageCallback(messageCallback_);
+    //estalish connection
     conn->connectEstablished();
 
 }

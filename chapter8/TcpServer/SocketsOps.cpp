@@ -139,6 +139,7 @@ struct sockaddr_in sockets::getLocalAddr(int sockfd){
     struct sockaddr_in local_addr;
     bzero(&local_addr,sizeof local_addr);
     socklen_t addrlen = sizeof(local_addr);
+    //get address of given sockfd
     if(::getsockname(sockfd,sockaddr_cast(&local_addr),&addrlen)<0){
         printf("sockets::getLocalAddr\n");
     }

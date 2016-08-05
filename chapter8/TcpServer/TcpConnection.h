@@ -1,5 +1,5 @@
 //
-// Created by fit on 16-8-5.
+// Created by zhouyang on 16-8-5.
 //
 
 #ifndef TCPCONNECTION_H
@@ -30,34 +30,42 @@ namespace muduo {
 
         ~TcpConnection();
 
+        //return loop
         EventLoop *getLoop() const {
             return loop_;
         }
 
+        //return connection name
         const std::string &name() const {
             return name_;
         }
 
+        //return local address
         const InetAddress &localAddr() {
             return localAddr_;
         }
 
+        //return peer address
         const InetAddress &peerAddr() {
             return peerAddr_;
         }
 
+        //return if connected ?
         bool connected() const {
             return state_ == kConnected;
         }
 
+        //set connection callback function
         void setConnectionCallback(const ConnectionCallback &cb) {
             connectionCallback_ = cb;
         }
 
+        //set message callback function
         void setMessageCallback(const MessageCallback &cb) {
             messageCallback_ = cb;
         }
 
+        //establish connection
         void connectEstablished();
 
     private:

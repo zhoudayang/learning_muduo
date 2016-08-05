@@ -1,5 +1,5 @@
 //
-// Created by fit on 16-8-5.
+// Created by zhouyang on 16-8-5.
 //
 
 #include "TcpConnection.h"
@@ -36,11 +36,14 @@ void TcpConnection::connectEstablished() {
     assert(state_ == kConnecting);
     setState(kConnected);
     channel_->enableReading();
+    //called connection call back function
     connectionCallback_(shared_from_this());
 }
 
 void TcpConnection::handleRead() {
+    //read data
     char buf[65536];
     ssize_t n = ::read(channel_->fd(), buf, sizeof buf);
+    //call message callback function
     messageCallback_(shared_from_this(), buf, n);
 }

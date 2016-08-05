@@ -19,13 +19,14 @@ void onConnection(const muduo::TcpConnectionPtr &conn) {
 
 }
 
-void onMessage(const muduo::TcpConnectionPtr &conn,
-               const char *data,
-               ssize_t len) {
+void onMessage(const muduo::TcpConnectionPtr &conn, const char *data, ssize_t len) {
     printf("onMessage(): received %zd bytes from connection [%s]\n",
            len, conn->name().c_str());
+    printf("the client says : %s\n", data);
+
 }
 
+//因为暂时还没有处理连接断开的问题，所以客户端主动断开连接会造成busy loop
 int main() {
     printf("main() : pid = %d\n", getpid());
     muduo::InetAddress listenAddr(9988);
