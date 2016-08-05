@@ -8,8 +8,9 @@
 #include <string>
 #include <netinet/in.h>
 
+
 namespace muduo {
-    class InetAddress{
+    class InetAddress {
     public:
         //constructs an endpoint with given port number
         //mostly used in TcpServer listening
