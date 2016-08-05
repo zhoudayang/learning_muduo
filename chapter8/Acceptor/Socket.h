@@ -15,7 +15,7 @@ namespace muduo {
     //it's thread safe, all operations are delagated to os
     class Socket : boost::noncopyable {
     public:
-        explicit Socket(int sockfd) : sockfd_(sockfd_) { }
+        explicit Socket(int sockfd) : sockfd_(sockfd) { }
 
         ~Socket();
 

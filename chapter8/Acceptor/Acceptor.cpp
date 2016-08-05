@@ -15,11 +15,17 @@ using namespace muduo;
 
 Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr) :
         loop_(loop),
+        //create socket
         acceptSocket_(sockets::createNonBlockingOrDie()),
+        //create channel
         acceptChannel_(loop, acceptSocket_.fd()),
-        listening_(false) {
+        listening_(false)
+{
+    //设置地址可复用
     acceptSocket_.setReuseAddr(true);
+    //绑定监听地址
     acceptSocket_.bindAddress(listenAddr);
+    //设置read call back function
     acceptChannel_.setReadCallback(
             boost::bind(&Acceptor::handleRead, this)
     );
@@ -35,6 +41,7 @@ void Acceptor::listen() {
 void Acceptor::handleRead() {
     loop_->assertInLoopThread();
     InetAddress peerAddr(0);
+    //peerAddr client connection information
     int connfd = acceptSocket_.accept(&peerAddr);
     if (connfd > 0) {
         if (newConnectionCallback_) {

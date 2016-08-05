@@ -13,10 +13,15 @@ void newConnection(int sockfd,const muduo::InetAddress &peerAddr){
     muduo::sockets::close(sockfd);
 
 }
-
-int main(){
+/*
+ * POLLNVAL means that the file descriptor value is invalid.
+ * It usually indicates an error in your program,
+ * but you can rely on poll returning POLLNVAL
+ * if you've closed a file descriptor and you haven't opened any file since then that might have reused the descriptor.
+*/
+ int main(){
     printf("main(): pid= %d\n",getpid());
-    muduo::InetAddress listenAddr(9981);
+    muduo::InetAddress listenAddr(9987);
     muduo::EventLoop loop;
     muduo::Acceptor acceptor(&loop,listenAddr);
     acceptor.setNewConnectionCallback(newConnection);

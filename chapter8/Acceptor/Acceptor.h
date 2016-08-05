@@ -18,6 +18,7 @@ namespace muduo {
 
     class Acceptor : boost::noncopyable {
     public:
+        //connection callback function
         typedef boost::function<void(int sockfd, const InetAddress &)> NewConnectionCallback;
 
         Acceptor(EventLoop *loop, const InetAddress &listenAddr);

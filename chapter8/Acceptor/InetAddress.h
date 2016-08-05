@@ -17,11 +17,12 @@ namespace muduo {
         explicit InetAddress(uint16_t port);
 
         //constructs an endpoint with give ip and port
-
         InetAddress(const std::string &ip, uint16_t port);
 
+        //construct an endpoint with sockaddr_in
         InetAddress(const struct sockaddr_in &addr) : addr_(addr) { }
 
+        //convert addr to host:port
         std::string toHostPort() const;
 
         const struct sockaddr_in &getSockAddrInet() const {
@@ -34,11 +35,6 @@ namespace muduo {
 
     private:
         struct sockaddr_in addr_;
-
     };
-
-
 }
-
-
 #endif //INETADDRESS_H

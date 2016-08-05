@@ -26,10 +26,13 @@
 
 using namespace muduo;
 
+//linux下的socket INADDR_ANY表示的是一个服务器上所有的网卡（服务器可能不止一个网卡）
+//多个本地ip地址都进行绑定端口号，进行侦听。
 static const in_addr_t kInaddrAny = INADDR_ANY;
 
 BOOST_STATIC_ASSERT(sizeof(InetAddress) == sizeof(struct sockaddr_in));
 
+//设置绑定ip地址为INADDR_ANY
 InetAddress::InetAddress(uint16_t port) {
     bzero(&addr_, sizeof(addr_));
     addr_.sin_family = AF_INET;
