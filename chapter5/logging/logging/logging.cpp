@@ -79,16 +79,53 @@ void Logger::Impl::formatTime() {
         int len = snprintf(t_time, sizeof t_time, "%4d%02d%02d %02dL%02d:%02d",
                            tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_day, tm_time.tm_hour, tm_time.tm_min,
                            tm_time.tm_sec);
-        assert(len==17);
-        (void)len;
+        assert(len == 17);
+        (void) len;
     }
-    Fmt us(".%06dZ ",microseconds);
-    assert(us.length()=9);
+    Fmt us(".%06dZ ", microseconds);
+    assert(us.length() = 9);
     stream_ << T(t_time, 17) << T(us.data(), 9);
 }
 
 void Logger::Impl::finish() {
-    stream_<<" - "<<basename_<<":"<<line<<"\n";
+    stream_ << " - " << basename_ << ":" << line << "\n";
 }
 
-Logger::Logger(const char * file,int line):impl_(INFO,0,file,line){}
+Logger::Logger(const char *file, int line) : impl_(INFO, 0, file, line) {}
+
+Logger::Logger(const char *file, int line, LogLevel level, const char *func)
+        : impl_(level, 0, file, line) {
+    impl_.stream_ << func << ' ';
+
+}
+
+Logger::Logger(const char *file, int line, LogLevel level) : impl_(level, 0, file, line) {}
+
+Logger::Logger(const char *file, int line, bool toAbort)
+        : impl(toAbort ? FATAL : ERROR, errno, file, line) {}
+
+Logger::~Logger() {
+    impl_.finish();
+    const LogStream::Buffer &buf(stream().buffer());
+    g_output(buf.date(), buf.length());
+    if (impl_.level_ == FATAL) {
+        g_flush();
+        abort();
+    }
+}
+
+Logger::LogLevel Logger::logLevel() {
+    return g_logLevel;
+}
+
+void Logger::setLogLevel(LogLevel level) {
+    g_logLevel = level;
+}
+
+void Logger::setOutput(OutputFunc) {
+    g_output = out;
+}
+
+void Logger::setFlush(FlushFunc flush) {
+    g_flush = flush;
+}
