@@ -92,7 +92,8 @@ namespace muduo {
     class T {
     public:
         T(const char *str, int len) : str_(str), len_(len) {
-            assert(strlen(str) == len_);
+
+           assert(strlen(str) == len_);
         }
 
         const char *str_;

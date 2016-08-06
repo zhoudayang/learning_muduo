@@ -57,7 +57,7 @@ Logger::Impl::Impl(LogLevel level, int savedErrno, const char *file, int line)
     const char *path_sep_pos = strrchr(fullname_, '/');
     basename_ = (path_sep_pos != NULL) ? path_sep_pos + 1 : fullname_;
     formatTime();
-    Fmt tid("%5d", CurrentThread::tid());
+    Fmt tid("%6d", CurrentThread::tid());
     assert(tid.length() == 6);
     stream_ << T(tid.data(), 6);
     stream_ << T(LogLevelName[level], 6);
