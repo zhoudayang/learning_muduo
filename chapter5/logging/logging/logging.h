@@ -6,7 +6,7 @@
 #define LOGGING_H
 
 #include "LogStream.h"
-#include "datetime/Timestamp.h"
+#include "../datetime/Timestamp.h"
 #include <boost/scoped_ptr.hpp>
 
 namespace muduo {
@@ -41,10 +41,6 @@ namespace muduo {
         static void setLogLevel(LogLevel level);
 
         typedef void (*OutputFunc)(const char *msg, int len);
-
-        typedef void (*FlushFunc)();
-
-        typedef void(*OutputFunc)(const char *msg, inr len);
 
         typedef void(*FlushFunc)();
 

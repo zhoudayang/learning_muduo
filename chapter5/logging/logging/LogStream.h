@@ -20,7 +20,7 @@ namespace muduo {
         class FixedBuffer : boost::noncopyable {
         public:
             FixedBuffer() : cur_(data_) {
-                setCookie(cookeiStart);
+                setCookie(cookieStart);
             }
 
             ~FixedBuffer() {
@@ -34,7 +34,7 @@ namespace muduo {
                 }
             }
 
-            const char *data() {
+            const char *data() const {
                 return data_;
             }
 
@@ -73,7 +73,7 @@ namespace muduo {
             }
 
         private:
-            char *end() const {
+            const char *end() const {
                 return data_ + sizeof data_;
             }
 
@@ -120,6 +120,8 @@ namespace muduo {
         self &operator<<(long);
 
         self &operator<<(long long);
+
+        self &operator<<(unsigned long);
 
         self &operator<<(unsigned long long);
 
@@ -172,7 +174,6 @@ namespace muduo {
 
         Buffer buffer_;
 
-        static buffer_;
         static const int kMaxNumericSize = 32;
 
     };
@@ -195,8 +196,8 @@ namespace muduo {
         int length_;
     };
 
-    inline LogStream& operator<<(LogStream&s,const Fmt&fmt){
-        s.append(fmt.data(),fmt.length());
+    inline LogStream &operator<<(LogStream &s, const Fmt &fmt) {
+        s.append(fmt.data(), fmt.length());
         return s;
     }
 

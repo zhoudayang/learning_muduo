@@ -16,11 +16,11 @@ using namespace muduo::detail;
 
 namespace muduo {
     namespace detail {
-        const char *digits[] = "9876543210123456789";
+        const char digits []= "9876543210123456789";
         const char *zero = digits + 9;
         BOOST_STATIC_ASSERT(sizeof(digits) == 20);
         const char digitsHex[] = "0123456789abcdef";
-        BOOST_STATIC_ASSERT(sizeof digitsHex = 17);
+        BOOST_STATIC_ASSERT(sizeof digitsHex == 17);
 
         template<typename T>
         size_t convert(char buf[], T value) {
@@ -39,7 +39,7 @@ namespace muduo {
             return p - buf;
         }
 
-        size_t convertHex(char buf, uintptr_t value) {
+        size_t convertHex(char *buf, uintptr_t value) {
             uintptr_t i = value;
             char *p = buf;
             do {
@@ -82,10 +82,10 @@ void LogStream::staticCheck() {
 }
 
 template<typename T>
-void LogStream::formatInteger(T) {
+void LogStream::formatInteger(T v) {
     if (buffer_.avail() >= kMaxNumericSize) {
         size_t len = convert(buffer_.current(), v);
-        buffer_.append(len);
+        buffer_.add(len);
     }
 }
 
@@ -152,32 +152,28 @@ LogStream &LogStream::operator<<(double v) {
 template<typename T>
 Fmt::Fmt(const char *fmt, T val) {
     BOOST_STATIC_ASSERT(boost::is_arithmetic<T>::value == true);
-    length_ = sprintf(buf_, sizeof buf_, fmt, val);
+    length_ = snprintf(buf_, sizeof buf_, fmt, val);
     assert(static_cast<size_t >(length_) < sizeof buf_);
 }
 
-template Fmt::Fmt(const char *fmt, char) {}
+template Fmt::Fmt(const char *fmt, char) ;
 
-template Fmt::Fmt(const char *fmt, short) {}
+template Fmt::Fmt(const char *fmt, short) ;
 
-template Fmt::Fmt(const char *fmt, unsigned short) {}
+template Fmt::Fmt(const char *fmt, unsigned short) ;
 
-template Fmt::Fmt(const char *fmt, int) {}
+template Fmt::Fmt(const char *fmt, int) ;
 
-template Fmt::Fmt(const char *fmt, unsigned int) {}
+template Fmt::Fmt(const char *fmt, unsigned int) ;
 
-template Fmt::Fmt(const char *fmt, long) {}
+template Fmt::Fmt(const char *fmt, long) ;
 
-template Fmt::Fmt(const char *fmt, unsigned int) {}
+template Fmt::Fmt(const char *fmt, unsigned long) ;
 
-template Fmt::Fmt(const char *fmt, long) {}
+template Fmt::Fmt(const char *fmt, long long) ;
 
-template Fmt::Fmt(const char *fmt, unsigned long) {}
+template Fmt::Fmt(const char *fmt, unsigned long long) ;
 
-template Fmt::Fmt(const char *fmt, long long) {}
+template Fmt::Fmt(const char *fmt, float) ;
 
-template Fmt::Fmt(const char *fmt, unsigned long long) {}
-
-template Fmt::Fmt(const char *fmt, float) {}
-
-template Fmt::Fmt(const char *fmt, double) {}
+template Fmt::Fmt(const char *fmt, double) ;
