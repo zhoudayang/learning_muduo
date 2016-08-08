@@ -70,23 +70,19 @@ void Poller::updateChannel(Channel *channel) {
         channels_[pfd.fd] = channel;
     }
     else {
-        //assert channels_ exists channel
+        // update existing one
         assert(channels_.find(channel->fd()) != channels_.end());
-        //assert channels_[channel->fd()]==channel
         assert(channels_[channel->fd()] == channel);
         int idx = channel->index();
-        //assert idx lines between 0 and pollfds_.size()-1
-        assert(idx >= 0 && idx < static_cast<int> (pollfds_.size()));
-        struct pollfd &pfd = pollfds_[channel->fd()];
-        //assert fd is right
-        assert(pfd.fd == channel->fd() || pfd.fd == -1);
-        //set events
+        assert(0 <= idx && idx < static_cast<int>(pollfds_.size()));
+        struct pollfd& pfd = pollfds_[idx];
+        assert(pfd.fd == channel->fd() || pfd.fd == -channel->fd()-1);
         pfd.events = static_cast<short>(channel->events());
-        //reset revents to zero
         pfd.revents = 0;
-        //如果某一个Channel暂时不关心任何是时间，就将pollfd.fd设为-1,让poll(2)忽略此项
-        if (channel->isNoneEvent())
-            pfd.fd = -1;
+        if (channel->isNoneEvent()) {
+            // ignore this pollfd
+            pfd.fd = -channel->fd()-1;
+        }
     }
 }
 

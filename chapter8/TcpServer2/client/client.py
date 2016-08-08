@@ -24,7 +24,7 @@ class myClient(threading.Thread):
 
 if __name__ == "__main__":
     thread_list = []
-    # 创建10个threading.Thread对象
+    # 创建100个threading.Thread对象 同时向服务器发起访问
     for i in range(100):
         thread_list.append(myClient("127.0.0.1", 9918))
     # run
