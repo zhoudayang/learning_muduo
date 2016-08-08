@@ -66,11 +66,11 @@ void FixedBuffer<SIZE>::cookieStart() {}
 template<int SIZE>
 void FixedBuffer<SIZE>::cookieEnd() {}
 
-//template
-//class FixedBuffer<kSmallBuffer>;
-//
-//template
-//class FixedBuffer<kLargeBuffer>;
+template
+class FixedBuffer<kSmallBuffer>;
+
+template
+class FixedBuffer<kLargeBuffer>;
 
 void LogStream::staticCheck() {
     // double 数转换为十进制数的最大位数  下同
@@ -130,6 +130,7 @@ LogStream &LogStream::operator<<(unsigned long long v) {
 }
 
 LogStream &LogStream::operator<<(const void *p) {
+    //注意这里指针的数据类型为uintptr_t
     uintptr_t v = reinterpret_cast<uintptr_t >(p);
     if (buffer_.avail() > kMaxNumericSize) {
         char *buf = buffer_.current();

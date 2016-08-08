@@ -16,9 +16,10 @@ namespace muduo {
     __thread char t_time[32];
     __thread time_t t_lastSecond;
 
-//    const char *strerror_tl(int savedErrno) {
-//        return strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
-//    }
+    const char *strerror_tl(int savedErrno) {
+        //获取错误标号对应的字符串描述，存放在buf中
+        return strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
+    }
 
     Logger::LogLevel initLogLevel() {
         //设置了环境变量为TRACE
@@ -28,6 +29,7 @@ namespace muduo {
             return Logger::DEBUG;
     }
 
+    //初始化全局log level
     Logger::LogLevel g_logLevel = initLogLevel();
 
     const char *LogLevelName[Logger::NUM_LOG_LEVELS] = {
@@ -102,7 +104,6 @@ void Logger::Impl::formatTime() {
                            tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday, tm_time.tm_hour, tm_time.tm_min,
                            tm_time.tm_sec);
         assert(len == 17);
-        (void) len;
     }
     Fmt us(".%06dZ ", microseconds);
     assert(us.length() == 9);
@@ -127,7 +128,7 @@ Logger::Logger(const char *file, int line, bool toAbort)
         : impl_(toAbort ? FATAL : ERROR, errno, file, line) {}
 
 //!!在析构函数中做出finish处理
-//有几次调用构造函数就有几次调用析构函数，因为新建的对象没有引用，所以立即进行析构处理了
+///有几次调用构造函数就有几次调用析构函数，因为新建的对象没有引用，所以立即进行析构处理了
 Logger::~Logger() {
     impl_.finish();
     const LogStream::Buffer &buf(stream().buffer());
