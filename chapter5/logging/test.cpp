@@ -4,13 +4,18 @@
 
 #include "logging/logging.h"
 
-#include<stdio.h>
 
-int main(){
+
+int main() {
     LOG_TRACE << "trace";
     LOG_DEBUG << "debug";
     LOG_INFO << "Hello";
     LOG_WARN << "World";
     LOG_ERROR << "Error";
+    LOG_INFO << sizeof(muduo::Logger);
+    LOG_INFO << sizeof(muduo::LogStream);
+    LOG_INFO << sizeof(muduo::Fmt);
+    LOG_INFO << sizeof(muduo::LogStream::Buffer);
+
 
 }
