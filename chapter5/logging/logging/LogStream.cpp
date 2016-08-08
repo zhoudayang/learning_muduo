@@ -66,11 +66,11 @@ void FixedBuffer<SIZE>::cookieStart() {}
 template<int SIZE>
 void FixedBuffer<SIZE>::cookieEnd() {}
 
-template
-class FixedBuffer<kSmallBuffer>;
-
-template
-class FixedBuffer<kLargeBuffer>;
+//template
+//class FixedBuffer<kSmallBuffer>;
+//
+//template
+//class FixedBuffer<kLargeBuffer>;
 
 void LogStream::staticCheck() {
     // double 数转换为十进制数的最大位数  下同

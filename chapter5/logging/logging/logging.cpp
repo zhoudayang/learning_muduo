@@ -16,9 +16,9 @@ namespace muduo {
     __thread char t_time[32];
     __thread time_t t_lastSecond;
 
-    const char *strerror_tl(int savedErrno) {
-        return strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
-    }
+//    const char *strerror_tl(int savedErrno) {
+//        return strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
+//    }
 
     Logger::LogLevel initLogLevel() {
         if (::getenv("MUDUO_LOG_TRACE"))
