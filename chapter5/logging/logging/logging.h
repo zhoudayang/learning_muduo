@@ -49,6 +49,7 @@ namespace muduo {
         static void setFlush(FlushFunc);
 
     private:
+        //inner class
         class Impl {
         public:
             typedef Logger::LogLevel logLevel;
@@ -56,7 +57,7 @@ namespace muduo {
             Impl(LogLevel level, int old_errno, const char *file, int line);
 
             void formatTime();
-
+            //finish add debug level fullname and line number
             void finish();
 
             Timestamp time_;
@@ -86,7 +87,7 @@ namespace muduo {
 
 //!!此处"#val"表明　引入字符串　val
 #define CHECK_NOTNULL(val)\
-    ::muduo::CheckNotNull(__FILE__,__LINE__,"'" #val "' Must be non NULL",(val))
+    ::muduo::CheckNotNull(__FILE__,__LINE__,"'" #val "' Must be not NULL",(val))
 
     template<typename T>
     T *CheckNotNull(const char *file, int line, const char *names, T *ptr) {

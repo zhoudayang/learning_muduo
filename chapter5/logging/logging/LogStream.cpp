@@ -133,6 +133,7 @@ LogStream &LogStream::operator<<(const void *p) {
     uintptr_t v = reinterpret_cast<uintptr_t >(p);
     if (buffer_.avail() > kMaxNumericSize) {
         char *buf = buffer_.current();
+        //开头加上0x
         buf[0] = '0';
         buf[1] = 'x';
         size_t len = convertHex(buf + 2, v);

@@ -27,6 +27,7 @@ namespace muduo {
                 setCookie(cookieEnd);
             }
 
+            //append buf to cur_
             void append(const char *buf, int len) {
                 if (avail() > len) {
                     memcpy(cur_, buf, len);
@@ -38,41 +39,52 @@ namespace muduo {
                 return data_;
             }
 
+            //return length
             int length() const {
                 return cur_ - data_;
             }
 
+            //return character to current pointer
             char *current() {
                 return cur_;
             }
 
+            //capacity remain
             int avail() {
                 return static_cast<int>(end() - cur_);
             }
 
+            //forward cur_ pointer len pos
             void add(size_t len) {
                 cur_ += len;
             }
 
+            //reset pointer to head of data_
             void reset() {
                 cur_ = data_;
             }
 
+
+            //same as memset function
             void bzero() {
+                // Set N bytes of S to 0.
                 ::bzero(data_, sizeof data_);
             }
 
+            //for used by gdb
             const char *debugString();
 
             void setCookie(void(*cookie)()) {
                 cookie_ = cookie;
             }
 
+            //for used for unit test
             string asString() const {
                 return string(data_, length());
             }
 
         private:
+            //return end charcter
             const char *end() const {
                 return data_ + sizeof data_;
             }
@@ -88,7 +100,7 @@ namespace muduo {
         };
     }
 
-    //helper class for known string length for compile time
+    //helper class for known string length at compile time
     class T {
     public:
         T(const char *str, int len) : str_(str), len_(len) {
