@@ -16,6 +16,7 @@ using namespace muduo;
 __thread EventLoop *t_loopInThisThread = 0;
 const int kPollTimeMs = 10000;
 
+//创建event fd 用于在loop中运行给定函数
 static int createEventFd() {
     //noblocking  EFD_NONBLOCK非阻塞
     //调用exec之后会自动关闭文件描述符，防止泄露
@@ -54,6 +55,7 @@ EventLoop::EventLoop() :
 }
 
 EventLoop::~EventLoop() {
+    //not begin loop now
     assert(!looping_);
     //close event file description
     ::close(wakeupFd_);
@@ -97,9 +99,10 @@ void EventLoop::runInLoop(const Functor &cb) {
     }
 }
 
-//push cb to pendingFunctors
+//push cb to pendingFunctors,run after loop done
 void EventLoop::queueInLoop(const Functor &cb) {
     {
+        //保护pendingFunctors_
         std::unique_lock<std::mutex> lock(mutex_);
         //push cb into back of pendingFunctors_
         PendingFunctors_.push_back(cb);
@@ -135,7 +138,7 @@ void EventLoop::updateChannel(Channel *channel) {
 }
 
 void EventLoop::removeChannel(Channel *channel) {
-    assert(channel->ownerLoop()==this);
+    assert(channel->ownerLoop() == this);
     assertInLoopThread();
     poller_->removeChannel(channel);
 }
@@ -154,6 +157,7 @@ void EventLoop::wakeup() {
         printf("EventLoop::wakeup() reads %d bytes instead of 8 \n", n);
     }
 }
+
 //eventfd callback function
 void EventLoop::handleRead() {
     uint64_t one = 1;
@@ -163,6 +167,7 @@ void EventLoop::handleRead() {
     }
 }
 
+//calling functions store in PendingFunctors_
 void EventLoop::doPendingFunctors() {
     std::vector<Functor> functors;
     //now calling pending functors, set flag to true

@@ -31,7 +31,7 @@ Timestamp Poller::poll(int timeoutMs, ChannelList *activeChannels) {
     }
     return now;
 }
-
+//pull active channels into activeChannels
 void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) const {
     for (PollFdList::const_iterator pfd = pollfds_.begin(); pfd != pollfds_.end() && numEvents > 0; pfd++) {
         if (pfd->revents > 0) {
@@ -81,6 +81,7 @@ void Poller::updateChannel(Channel *channel) {
         pfd.revents = 0;
         if (channel->isNoneEvent()) {
             // ignore this pollfd
+            //set pollfd you want to ignore to -fd -1
             pfd.fd = -channel->fd()-1;
         }
     }
@@ -98,12 +99,15 @@ void Poller::removeChannel(Channel *channel) {
     assert(pfd.fd == -channel->fd() - 1 && pfd.events == channel->events());
     size_t n = channels_.erase(channel->fd());
     assert(n == 1);
+    //如果是最后一个元素，直接弹出
     if (implicit_cast<size_t>(idx) == pollfds_.size() - 1) {
         pollfds_.pop_back();
     } else {
+        //将其和最后一个元素进行交换，并将最后一个元素弹出
         int channelAtEnd = pollfds_.back().fd;
         iter_swap(pollfds_.begin() + idx, pollfds_.end() - 1);
         if (channelAtEnd < 0) {
+            //calculate real file descripter
             channelAtEnd = -channelAtEnd - 1;
         }
         channels_[channelAtEnd]->set_index(idx);

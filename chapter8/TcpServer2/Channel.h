@@ -82,11 +82,13 @@ namespace muduo {
             update();
         }
 
+        //does not care writing event
         void disableWriting() {
             events_ &= ~kWriteEvent;
             update();
         }
 
+        //care nothing
         void disableAll() {
             events_ = kNoneEvent;
             update();
@@ -115,6 +117,7 @@ namespace muduo {
         static const int kWriteEvent;
         static const int kReadEvent;
 
+        //EventLoop
         EventLoop *loop_;
         //file description to pull
         const int fd_;
@@ -124,7 +127,7 @@ namespace muduo {
         int revents_;
         //used by Poller,the index of pollfds_ in Poller
         int index_;
-
+        //if is now handling the occured event
         bool eventHandling_;
         //read callback function
         EventCallback readCallback_;

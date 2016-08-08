@@ -21,20 +21,24 @@ Channel::Channel(EventLoop *loop, int fd)
 
 Channel::~Channel() {
     //断言在事件处理期间，本channel 对象不会析构
+    //否则会引起core dump
     assert(!eventHandling_);
 }
 
 void Channel::update() {
+    //refresh channel
     loop_->updateChannel(this);
 }
 
 
 void Channel::handleEvent() {
+    //now I am handling the event
     eventHandling_ = true;
     //an error happened
     if (revents_ & POLLNVAL) {
         printf("Channel::handle_events() POLLNVAL\n");
     }
+    //close the file descripter
     if((revents_&POLLHUP) &&(revents_&POLLIN)){
         LOG_WARN<<"Channel::handle_event POLLHUP";
         if(closeCallback_){
@@ -56,5 +60,6 @@ void Channel::handleEvent() {
         if (writeCallback_)
             writeCallback_();
     }
+    //now I am not handling the event
     eventHandling_ = false;
 }

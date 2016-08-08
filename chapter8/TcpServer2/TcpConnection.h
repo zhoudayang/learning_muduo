@@ -65,7 +65,8 @@ namespace muduo {
             messageCallback_ = cb;
         }
 
-        void setCloseCallback(const CloseCallback &cb){
+        //set close callback function
+        void setCloseCallback(const CloseCallback &cb) {
             closeCallback_ = cb;
         }
 
@@ -77,7 +78,7 @@ namespace muduo {
 
     private:
         enum StateE {
-            kConnecting, kConnected,kDisconnected,
+            kConnecting, kConnected, kDisconnected,
         };
 
         void setState(StateE s) {
@@ -85,8 +86,11 @@ namespace muduo {
         }
 
         void handleRead();
+
         void handleWrite();
+
         void handleClose();
+
         void handleError();
 
         EventLoop *loop_;

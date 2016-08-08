@@ -65,5 +65,6 @@ void TcpServer::removeConnection(const TcpConnectionPtr &conn) {
              << "] - connection " << conn->name();
     size_t n = connections_.erase(conn->name());
     assert(n==1);
+    //使用boost:bind将TcpConnection的生命周期延长到调用connectDestroyed的时刻
     loop_->queueInLoop(boost::bind(&TcpConnection::connectDestroyed,conn));
 }

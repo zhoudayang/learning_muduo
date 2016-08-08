@@ -27,8 +27,10 @@ namespace muduo {
 
         typedef boost::function<void()> Functor;
 
+        //constructor
         EventLoop();
 
+        //destructor
         ~EventLoop();
 
 
@@ -36,6 +38,7 @@ namespace muduo {
         //must be called in same thread as creation of object
         void loop();
 
+        //quit loop
         void quit();
 
         //time when poll returns, usually means data arrival.
@@ -70,8 +73,10 @@ namespace muduo {
         //internal use only
         void updateChannel(Channel *channel);
 
+        //remove channel
         void removeChannel(Channel *channel);
 
+        //if is in loop thread
         bool isInLoopThread() const {
             return threadId_ == CurrentThread::tid();
         }
@@ -84,9 +89,9 @@ namespace muduo {
 
     private:
         void abortNotInLoopThread();
+
         void handleRead();// wake up
         void doPendingFunctors();
-
 
 
         typedef std::vector<Channel *> ChannelList;
@@ -106,7 +111,7 @@ namespace muduo {
 
         //unlike in TimeQueue, which is an internal class
         //we don't expose channel to client
-        boost::scoped_ptr<Channel >wakeupChannel_;
+        boost::scoped_ptr<Channel> wakeupChannel_;
         std::mutex mutex_;
         std::vector<Functor> PendingFunctors_;
 

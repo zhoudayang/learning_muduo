@@ -34,10 +34,12 @@ namespace muduo {
             messageCallback_ = cb;
         }
 
-        void removeConnection(const TcpConnectionPtr&conn);
+        void removeConnection(const TcpConnectionPtr &conn);
+
     private:
         //not thread safe,but in loop
-        void newConnection(int sockfd,const InetAddress&peerAddr);
+        void newConnection(int sockfd, const InetAddress &peerAddr);
+
         typedef std::map<std::string, TcpConnectionPtr> ConnectionMap;
 
         EventLoop *loop_;

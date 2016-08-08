@@ -152,6 +152,7 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
         nextExpire = timers_.begin()->second->expiration();
     }
     if (nextExpire.valid()) {
+        //重新设置下一个触发的定时器
         resetTimerfd(timerfd_, nextExpire);
     }
 }

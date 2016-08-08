@@ -29,7 +29,7 @@ TcpConnection::TcpConnection(EventLoop *loop, const std::string &name, int sockf
 
     channel_->setReadCallback(boost::bind(&TcpConnection::handleRead, this));
     channel_->setWriteCallback(boost::bind(&TcpConnection::handleWrite,this));
-    channel_->setErrorCallback(boost::bind(&TcpConnection::handleWrite,this));
+    channel_->setErrorCallback(boost::bind(&TcpConnection::handleError,this));
     channel_->setCloseCallback(boost::bind(&TcpConnection::handleClose,this));
 }
 
@@ -46,7 +46,7 @@ void TcpConnection::connectEstablished() {
     //called connection call back function
     connectionCallback_(shared_from_this());
 }
-void TcpConnection::connectDestroyed() {
+void TcpConnection::    connectDestroyed() {
     loop_->assertInLoopThread();
     assert(state_==kConnected);
     setState(kDisconnected);
@@ -61,6 +61,7 @@ void TcpConnection::handleRead() {
     //call message callback function
     if(n>0)
         messageCallback_(shared_from_this(), buf, n);
+        //if n==0 call handle close function
     else if(n==0)
         handleClose();
     else
