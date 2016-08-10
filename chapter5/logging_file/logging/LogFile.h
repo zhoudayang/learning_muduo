@@ -5,15 +5,13 @@
 #ifndef LOGFILE_H
 #define LOGFILE_H
 
-#include <mutex>
+#include "../thread/Mutex.h"
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-
 namespace muduo {
 
     using std::string;
-    using std::mutex;
 
     class LogFile : boost::noncopyable {
     public:
@@ -35,8 +33,10 @@ namespace muduo {
         const string basename_;
         const size_t rollSize_;
         const int flushInterval_;
+
         int count_;
-        mutex mutex_;
+
+        boost::scoped_ptr<MutexLock> mutex_;
         time_t startOfPeriod;
         time_t lastRoll_;
         time_t lastFlush_;
@@ -45,9 +45,8 @@ namespace muduo {
 
         boost::scoped_ptr<File> file_;
 
-        const static int kCheckTimeRoll = 1024;
-        const static int kRollPerSeconds = 60 * 60 * 24;
-
+        const static int kCheckTimeRoll_ = 1024;
+        const static int kRollPerSeconds_ = 60 * 60 * 24;
 
     };
 
