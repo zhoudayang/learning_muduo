@@ -13,12 +13,15 @@ using namespace muduo;
 class LogFile::File : boost::noncopyable {
 public:
     explicit File(const string &filename) :
+            //open file  fp_ file_descriptor
             fp_(::fopen(filename.data(), "ae")),
-            writtenBytes_(0) {
+            writtenBytes_(0)
+    {
+        //set file buffer
         ::setbuffer(fp_, buffer_, sizeof buffer_);
     }
 
-    ~File() {
+    ~File() {//close file
         ::fclose(fp_);
     }
 
@@ -40,18 +43,21 @@ public:
             n += x;
             remain = len - n;
         }
+        //add len to writtenBytes
         writtenBytes_ += len;
     }
 
     void flush() {
+        //flush the file
         ::fflush(fp_);
     }
-
+    //return written bytes
     size_t writtenBytes() const {
         return writtenBytes_;
     }
 
 private:
+    //write logline with len to fp_
     size_t write(const char *logline, size_t len) {
 #undef fwrite_unlocked
         return ::fwrite_unlocked(logline, 1, len, fp_);
@@ -71,12 +77,14 @@ LogFile::LogFile(const string &basename, size_t rollSize, bool threadSafe, int f
  lastRoll_(0),
  lastFlush_(0)
 {
-    assert(basename.find('/')==string::npos);
+    assert(basename.find('/')==string::npos);//在basename中没有/
     rollFile();
 }
 LogFile::~LogFile() {}
 
+//!!调用入口
 void LogFile ::append(const char *logline, int len) {
+    // 需要保证线程安全
     if(mutex_){
         MutexLockGuard lock(*mutex_);
         append_unlocked(logline,len);
@@ -94,19 +102,24 @@ void LogFile::flush(){
         file_->flush();
 }
 
+//!! 关键入口
 void LogFile::append_unlocked(const char *logline, int len) {
     file_->append(logline,len);
+    //写入数量大于rollSize_ roll the log file
     if(file_->writtenBytes()>rollSize_){
         rollFile();
     }
     else{
+        //写入数量大于kCheckTimeRoll_，需要检查是否需要roll file
         if(count_>kCheckTimeRoll_){
             count_=0;
             //::全局作用域符号
             time_t now =::time(NULL);
             time_t thisPeriod_ = now/kRollPerSeconds_*kRollPerSeconds_;
+            //周期不同，进入了下一个周期 roll file
             if(thisPeriod_!=startOfPeriod){
                 rollFile();
+             // 超过最大flush 间隔 flush
             }else if(now -lastFlush_ >flushInterval_){
                 lastFlush_ =now;
                 file_->flush();
@@ -126,10 +139,12 @@ void LogFile::rollFile(){
         lastRoll_ = now;
         lastFlush_ = now;
         startOfPeriod =start;
+        //新建File对象
         file_.reset(new File(filename));
     }
 }
 
+//get log file name
 string LogFile ::getLogFileName(const string &basename, time_t *now) {
     string filename;
     filename.reserve(basename.size()+32);

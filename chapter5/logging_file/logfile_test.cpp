@@ -7,10 +7,12 @@
 
 boost ::scoped_ptr<muduo::LogFile> g_logFile;
 
+//output function
 void outputFunc(const char *msg,int len){
     g_logFile->append(msg,len);
 }
 
+//flush function
 void flushFunc(){
     g_logFile->flush();
 }
