@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(logging_file)
+project(async_log)
 include_directories(${CMAKE_SOURCE_DIR})
 set(src LogStream.cpp logging.cpp LogFile.cpp)
 add_library(log SHARED ${src})
