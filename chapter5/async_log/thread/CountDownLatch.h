@@ -27,7 +27,7 @@ namespace muduo {
                 condition_.notify_all();
         }
 
-        void getCount() const {
+        int getCount() const {
             std::unique_lock<std::mutex> lock(mutex_);
             return count_;
         }

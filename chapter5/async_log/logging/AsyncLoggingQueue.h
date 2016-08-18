@@ -70,7 +70,7 @@ namespace muduo {
                     assert(running_ == false);
                     break;
                 }
-                output.append(mag.date(), msg.length());
+                output.append(msg.data(), msg.length());
             }
             output.flush();
         }
@@ -84,47 +84,47 @@ namespace muduo {
 
 
     };
+
+    typedef AsyncLoggingT<std::string, muduo::BlockingQueue> AsyncLoggingUnBoundedQueue;
+    typedef AsyncLoggingT<std::string, muduo::BoundedBlockingQueue> AsyncLoggingBoundedQueue;
+
+    struct LogMessage {
+        LogMessage(const char *msg, int len) : length_(len) {
+            assert(length_ <= sizeof data_);
+            ::memcpy(data_, msg, length_);
+        }
+
+        LogMessage() : length_(0) {}
+
+        LogMessage(const LogMessage &rhs) :
+                length_(rhs.length_) {
+            assert(length_ <= sizeof data_);
+            ::memcpy(data_, rhs.data_, length_);
+        }
+
+        LogMessage &operator=(const LogMessage &rhs) {
+            length_ = rhs.length_;
+            assert(length_ <= sizeof data_);
+        }
+
+        const char *data() const {
+            return data_;
+        }
+
+        int length() const {
+            return length_;
+        }
+
+        bool empty() const {
+            return length_ == 0;
+        }
+
+        char data_[4000];
+        size_t length_;
+    };
+
+    typedef AsyncLoggingT<LogMessage, muduo::BlockingQueue> AsyncLoggingUnboundedQueueL;
+    typedef AsyncLoggingT<LogMessage, muduo::BoundedBlockingQueue> AsyncLoggingBoundedQueueL;
+
 }
-typedef AsyncLoggingT <string, muduo::BlockingQueue> AsyncLoggingUnboundedQueue;
-typedef AsyncLoggingT <string, muduo::BoundedBlockingQueue> AsyncLoggingBoundedQueue;
-
-struct LogMessage {
-    LogMessage(const char *msg, int len) : length_(len) {
-        assert(length_ <= sizeof data_);
-        ::memcpy(data_, msg, length_);
-    }
-
-    LogMessage() : length_(0) {}
-
-    LogMessage(const LogMessage &rhs) :
-            length_(rhs.length_) {
-        assert(length_ <= sizeof data_);
-        ::memccpy(data_, rhs.data_, length_);
-    }
-
-    LogMessage &operator=(const LogMessage &rhs) {
-        length_ = rhs.length_;
-        assert(length_ <= sizeof data_);
-    }
-
-    const char *data() const {
-        return data_;
-    }
-
-    int length() const {
-        return length_;
-    }
-
-    bool empty() const {
-        return length_ == 0;
-    }
-
-    char data_[4000];
-    size_t length_;
-};
-
-typedef AsyncLoggingT <LogMessage, muduo::BlockingQueue> AsyncLoggingUnboundedQueueL;
-typedef AsyncLoggingT <LogMessage, muduo::BoundedBlockingQueue> AsyncLoggingBoundedQueuel;
-
-
 #endif //
