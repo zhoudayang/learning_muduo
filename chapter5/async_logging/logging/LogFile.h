@@ -30,20 +30,15 @@ namespace muduo {
 
         void rollFile();
 
-        //basename of logfile
         const string basename_;
-        //roll size
         const size_t rollSize_;
-        //flush interval
         const int flushInterval_;
 
         int count_;
 
         boost::scoped_ptr<MutexLock> mutex_;
         time_t startOfPeriod;
-        //上一次roll的时间
         time_t lastRoll_;
-        //上一次flush的时间
         time_t lastFlush_;
 
         class File;
