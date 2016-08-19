@@ -1,6 +1,0 @@
-cmake_minimum_required(VERSION 3.5)
-project(async_log)
-find_package(Threads)
-set(src Atomic.h Thread.cpp Mutex.h BlockingQueue.h BoundedBlockingQueue.h CountDownLatch.h)
-add_library(thread SHARED ${src})
-target_link_libraries(thread ${CMAKE_TREAD_LIBS_INIT})

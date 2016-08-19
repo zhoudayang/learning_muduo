@@ -1,6 +1,0 @@
-cmake_minimum_required(VERSION 3.5)
-project(async_log)
-include_directories(${CMAKE_SOURCE_DIR})
-set(src LogStream.cpp logging.cpp LogFile.cpp AsyncLoggingDoubleBuffer.h AsyncLoggingQueue.h)
-add_library(log SHARED ${src})
-target_link_libraries(log thread time)
