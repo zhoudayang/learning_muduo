@@ -7,13 +7,9 @@
 
 #include <boost/noncopyable.hpp>
 #include <CurrentThread.h>
-
-#ifdef NDEBUG
-#define NDEBUG
 #include <assert.h>
-#endif
-
 #include <pthread.h>
+#include "CurrentThread.h"
 
 namespace muduo {
 
@@ -51,12 +47,29 @@ namespace muduo {
         }
 
     private:
+        //设置Condition 为友元类，可以访问私有成员UnaddignGuard
         friend class Condition;
 
+        class UnassignGuard : boost::noncopyable {
+        public:
+            UnassignGuard(MutexLock &owner) : owner_(owner) {
+                owner.unassignHolder();
+            }
+
+            ~UnassignGuard() {
+                owner_.assignHolder();
+            }
+
+        private:
+            MutexLock &owner_;
+        };
+
+//       set holder
         void unassignHolder() {
             holder_ = 0;
         }
 
+//      unset holder thread tid
         void assignHolder() {
             holder_ = CurrentThread::tid();
         }
@@ -83,5 +96,8 @@ namespace muduo {
 
 }
 
-
+//prevent misuse like
+//MutexLockGuard(mutex_)
+//A tempory object doesn't hold the lock for long!
+#define MutexLockGuard(x) error "Missing guard object name"
 #endif
