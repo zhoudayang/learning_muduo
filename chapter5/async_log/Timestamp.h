@@ -10,7 +10,7 @@
 #include <boost/operators.hpp>
 
 namespace muduo {
-    class Timestamp : public muduo::copyable, public boost::less_than_comparable<Timestamp> {
+    class Timestamp : public copyable, public boost::less_than_comparable<Timestamp> {
     public:
         Timestamp() : microSecondsSinceEpoch_(0) {}
 
@@ -24,7 +24,7 @@ namespace muduo {
 
         string toFormattedString(bool showMicrosecond = true) const;
 
-        bool volid() const {
+        bool valid() const {
             return microSecondsSinceEpoch_ > 0;
         }
 
@@ -66,6 +66,17 @@ namespace muduo {
     inline bool operator>(Timestamp lhs, Timestamp rhs) {
         return lhs.microSecondsSinceEpoch() > rhs.microSecondsSinceEpoch();
     }
+
+    inline double timeDifferentce(Timestamp high, Timestamp low) {
+        int64_t diff = high.microSecondsSinceEpoch() - low.microSecondsSinceEpoch();
+        return static_cast<double>(diff) / Timestamp::kMicroSecondsPerSecond;
+    }
+
+    inline Timestamp addTime(Timestamp timestamp, double seconds) {
+        int64_t delta = static_cast< int64_t >(seconds * Timestamp::kMicroSecondsPerSecond);
+        return Timestamp(timestamp.microSecondsSinceEpoch() + delta);
+    }
+
 }
 
 
