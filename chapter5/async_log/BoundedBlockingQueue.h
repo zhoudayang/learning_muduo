@@ -71,7 +71,9 @@ namespace muduo {
 
     private:
         mutable MutexLock mutex_;
+        //notify thread when queue_ is not empty
         Condition notEmpty_;
+        //notify thread when queue_ is not full
         Condition notFull_;
         boost::circular_buffer<T> queue_;
     };
