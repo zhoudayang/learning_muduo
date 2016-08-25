@@ -8,6 +8,7 @@
 #include <boost/noncopyable.hpp>
 #include <stdint.h>
 
+//atomic integer class based on gcc marco definition
 namespace muduo {
     namespace detail {
         template<typename T>

@@ -1,11 +1,14 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+//only for gcc
+//don't support gcc
 #include <stdint.h>
 #include <ext/vstring.h>
 #include <ext/vstring_fwd.h>
 #include <assert.h>
 
+//pass
 namespace muduo {
     typedef __gnu_cxx::__sso_string string;
 
@@ -23,6 +26,8 @@ namespace muduo {
         // completely.
         // 编译期检查
         if (false) {
+            // implicit_cast<up_class,down_class> only support upcast
+            // if use as implicit_cast<down_class,up_class>, will get compile error
             implicit_cast<From *, To>(0);
         }
         return static_cast<To>(f);
