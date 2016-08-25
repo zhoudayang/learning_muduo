@@ -9,7 +9,7 @@
 #include <deque>
 #include <assert.h>
 #include "Mutex.h"
-
+//blocking queue with any size
 namespace muduo {
     template<typename T>
     class BlockingQueue : boost::noncopyable {
@@ -21,13 +21,8 @@ namespace muduo {
             queue_.push_back(x);
             notEmpty_.notify();
         }
-
-        void put(const T &x) {
-            MutexLockGuard lock(mutex_);
-            queue_.push_back(x);
-            notEmpty_.notify();
-        }
-
+        
+        //右值引用版本
         void put(T &&x) {
             MutexLockGuard lock(mutex_);
             queue_.push_back(std::move(x));
