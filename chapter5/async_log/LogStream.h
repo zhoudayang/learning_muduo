@@ -117,62 +117,95 @@ namespace muduo {
         self &operator<<(long long);
 
         self &operator<<(unsigned long long);
+        self &operator <<(const void *);
 
-        self &operator <<(float v){
-            *this<< static_cast<double> (v);
+        self &operator<<(float v) {
+            *this << static_cast<double> (v);
             return *this;
         }
-        self &operator <<(double);
-        self&operator <<(char v){
-            buffer_.append(&v,1);
+
+        self &operator<<(double);
+
+        self &operator<<(char v) {
+            buffer_.append(&v, 1);
             return *this;
         }
-        self&operator<<(const char *str){
-            if(str){
-                buffer_.append(str,strlen(Str));
-            }else{
-                buffer_.append("(null)",6);
+
+        self &operator<<(const char *str) {
+            if (str) {
+                buffer_.append(str, strlen(Str));
+            } else {
+                buffer_.append("(null)", 6);
             }
             return *this;
         }
 
-        self &operator<<(const unsigned char *str){
+        self &operator<<(const unsigned char *str) {
             return operator<<(reinterpret_cast<const char *>(str));
         }
 
-        self &operator<<(const string &v){
-            buffer_.append(v.c_str(),v.size());
+        self &operator<<(const string &v) {
+            buffer_.append(v.c_str(), v.size());
             return *this;
         }
-        self &operator<<(const std::string &v){
-            buffer_.append(v.c_str(),v.size());
+
+        self &operator<<(const std::string &v) {
+            buffer_.append(v.c_str(), v.size());
             return *this;
         }
-        self &operator <<(const StringPiece &v){
-            buffer_.append(v.data(),v.size());
+
+        self &operator<<(const StringPiece &v) {
+            buffer_.append(v.data(), v.size());
             return *this;
         }
-        self&operator <<(const Buffer &v){
+
+        self &operator<<(const Buffer &v) {
             *this << v.toStringPiece();
             return *this;
         }
-        void append(const char *data,int len){
-            buffer_.append(data,len);
+
+        void append(const char *data, int len) {
+            buffer_.append(data, len);
         }
+
         const Buffer &buffer() const {
             return buffer_;
         }
-        void resetBuffer(){
+
+        void resetBuffer() {
             buffer_.reset();
         }
+
     private:
         void staticCheck();
-        template <typename T>
+
+        template<typename T>
         void formatInteger(T);
+
         Buffer buffer_;
         staic const int kMaxNumericSize = 32;
     };
 
+    class Fmt {
+    public:
+        template<typename T>
+        Fmt(const char *fmt, T val);
+
+        const char *data() const {
+            return buf_;
+        }
+
+        int length() const { return length_; }
+
+    private:
+        char buf_[32];
+        int length_;
+    };
+
+    inline LogStream &operator<<(LogStream &s, const Fmt &fmt) {
+        s.append(fmt.data(), fmt.length());
+        return s;
+    }
 }
 
 

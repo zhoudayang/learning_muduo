@@ -9,7 +9,7 @@
 namespace muduo {
     typedef __gnu_cxx::__sso_string string;
 
-    // 只能up_cast 不能up_cast
+    // 只能up_cast 不能down_cast
     template<typename To, typename From>
     inline To implicit_cast(From const &f) {
         return f;
