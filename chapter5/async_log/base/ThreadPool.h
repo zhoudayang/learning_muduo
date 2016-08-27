@@ -15,6 +15,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include <deque>
+//线程池
 
 namespace muduo {
     class ThreadPool : boost::noncopyable {
