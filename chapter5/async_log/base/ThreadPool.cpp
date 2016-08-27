@@ -12,6 +12,7 @@
 
 using namespace muduo;
 
+
 ThreadPool::ThreadPool(const string &nameArg)
         : mutex_(),
           notEmpty_(mutex_),
@@ -35,10 +36,12 @@ void ThreadPool::start(int numThreads) {
     for (int i = 0; i < numThreads; i++) {
         char id[32];
         snprintf(id, sizeof id, "%d", i + 1);
+        //each thread run runInThread function, which take function from queue_ to run
         threads_.push_back(new muduo::Thread(
-                boost::bind(&ThreadPool::runInThread, this), name_+id));
+                boost::bind(&ThreadPool::runInThread, this), name_ + id));
         threads_[i].start();
     }
+    //if numThreads equal to 0 and threadInitCallback_ is not null, run threadInitCallback_ function
     if (numThreads == 0 && threadInitCallback_) {
         threadInitCallback_();
     }
@@ -47,9 +50,15 @@ void ThreadPool::start(int numThreads) {
 void ThreadPool::stop() {
     {
         MutexLockGuard lock(mutex_);
+        //key code here!
+        //set running_ to false
         running_ = false;
+        ////唤醒等待queue_中元素的每个线程,其中take函数中的循环因为running_为false而暂停，立即返回一个值为空的Task对象，因为
+        ////该对象为空，线程不运行任何function，直接返回　
         notEmpty_.notifyAll();
     }
+    //join each thread
+    //run join function of each elem of threads_
     for_each(threads_.begin(), threads_.end(), boost::bind(&muduo::Thread::join, _1));
 }
 
@@ -86,8 +95,10 @@ void ThreadPool::run(const Task &&task) {
     }
 }
 
+//take function from queue_ to run it
 ThreadPool::Task ThreadPool::take() {
     MutexLockGuard lock(mutex_);
+    //queue_ is empty ,wait for next one
     while (queue_.empty() && running_) {
         notEmpty_.wait();
     }
@@ -96,24 +107,30 @@ ThreadPool::Task ThreadPool::take() {
         task = queue_.front();
         queue_.pop_front();
         if (maxQueueSize_ > 0) {
+            //queue_　is not full now
             notFull_.notify();
         }
     }
     return task;
 }
 
+
 bool ThreadPool::isFull() const {
     mutex_.assertLocked();
     return maxQueueSize_ > 0 and queue_.size() >= maxQueueSize_;
 }
 
+
 void ThreadPool::runInThread() {
     try {
         if (threadInitCallback_) {
+            //before run the function, run the threadInitCallback_　function first if it exists
             threadInitCallback_();
         }
         while (running_) {
+            //take function from queue_ to run it
             Task task(take());
+            // if
             if (task) {
                 task();
             }

@@ -46,15 +46,20 @@ namespace muduo {
             return name_;
         }
 
+        //return current size of thread pool
         size_t queueSize() const;
 
+        //add function to thread pool
         void run(const Task &f);
 
-        void run(const Task && f);
+        //add function to thread pool 右值引用版本
+        void run(const Task &&f);
 
     private:
+        //thread pool is full now ?
         bool isFull() const;
 
+        //run task function in thread
         void runInThread();
 
         Task take();
@@ -67,6 +72,7 @@ namespace muduo {
         boost::ptr_vector<muduo::Thread> threads_;
         std::deque<Task> queue_;
         size_t maxQueueSize_;
+        // if running_ is false, 唤醒take函数，他会立即返回
         bool running_;
     };
 

@@ -103,11 +103,11 @@ namespace muduo {
         return g_logLevel;
     }
 
-#define LOG_TRACE if(muduo::Logger::logLevel() < = muduo::Logger::TRACE)\
+#define LOG_TRACE if(muduo::Logger::LogLevel() <= muduo::Logger::TRACE)\
     muduo::Logger(__FILE__,__LINE__,muduo::Logger::TRACE,__func__).stream()
-#define LOG_DEBUG if(muduo::Logger::logLevel()<=muduo::Logger:DEBUG)\
+#define LOG_DEBUG if(muduo::Logger::LogLevel()<=muduo::Logger::DEBUG)\
     muduo::Logger(__FILE__,__LINE__,muduo::Logger::DEBUG,__func__).stream()
-#define LOG_INFO if(muduo::Logger::logLevel()<=muduo::Logger::INFO)\
+#define LOG_INFO if(muduo::Logger::LogLevel()<=muduo::Logger::INFO)\
     muduo::Logger(__FILE__,__LINE__).stream()
 #define LOG_WARN muduo::Logger(__FILE__,__LINE__,muduo::Logger::WARN).stream()
 #define LOG_ERROR muduo::Logger(__FILE__,__LINE__,muduo::Logger::ERROR).stream()
