@@ -97,7 +97,7 @@ namespace muduo {
         }
 
         bool operator==(const StringPiece &x) const {
-            return ((length == x.length_) && (memcmp(ptr_, x.ptr_, length_) == 0));
+            return ((length_ == x.length_) && (memcmp(ptr_, x.ptr_, length_) == 0));
         }
 
         bool operator!=(const StringPiece &x) const {

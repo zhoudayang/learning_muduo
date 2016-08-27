@@ -131,12 +131,12 @@ Thread::Thread(const ThreadFunc &func, const string &n)
 }
 
 Thread::Thread(ThreadFunc &&func, const string &n)
-        : started_(false), joined_(false), pthreadId_(0), tid_(new pid_t(0)), func(std::move(func)), name_(n) {
+        : started_(false), joined_(false), pthreadId_(0), tid_(new pid_t(0)), func_(std::move(func)), name_(n) {
     setDefaultName();
 }
 
 Thread::~Thread() {
-    if (started__ && !joined_) {
+    if (started_ && !joined_) {
         pthread_detach(pthreadId_);
     }
 }

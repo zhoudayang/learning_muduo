@@ -62,7 +62,7 @@ namespace muduo {
         size_t rollSize_;
         muduo::Thread thread_;
         muduo::CountDownLatch latch_;
-        muduo::Mutexlock mutex_;
+        muduo::MutexLock mutex_;
         muduo::Condition cond_;
         BufferPtr currentBuffer_;
         BufferPtr nextBuffer_;

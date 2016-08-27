@@ -58,7 +58,7 @@ namespace muduo {
     }
 
     inline LogStream &operator<<(LogStream &s, const Logger::SourceFile &v) {
-        s.append(v.data_, size_);
+        s.append(v.data_, v.size_);
         return s;
     }
 
@@ -78,13 +78,19 @@ namespace muduo {
 
 using namespace muduo;
 
-Logger::Impl::Impl(LogLevel level, int old_errno, const SourceFile &file, int line)
-        : time_(Timestamp::now()), stream_(), level_(level), line_(line), basename_(file) {
+Logger::Impl::Impl(LogLevel level, int savedErrno, const SourceFile &file, int line)
+        : time_(Timestamp::now()),
+          stream_(),
+          level_(level),
+          line_(line),
+          basename_(file)
+{
     formatTime();
     CurrentThread::tid();
     stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
-    stream_ << T(LogLevel[level], 6);
-    if (savedErrno != 0) {
+    stream_ << T(LogLevelName[level], 6);
+    if (savedErrno != 0)
+    {
         stream_ << strerror_tl(savedErrno) << " (errno=" << savedErrno << ") ";
     }
 }
@@ -142,14 +148,14 @@ Logger::Logger(SourceFile file, int line, bool toAbort) :
 Logger::~Logger() {
     impl_.finish();
     const LogStream::Buffer &buf(stream().buffer());
-    g_output(buf.date(), buf.length());
-    if (impl_.level == FATAL) {
+    g_output(buf.data(), buf.length());
+    if (impl_.level_ == FATAL) {
         g_flush();
         abort();
     }
 }
 
-void Logger::setLogLevel(Loglevel level) {
+void Logger::setLogLevel(LogLevel level) {
     g_logLevel = level;
 }
 
@@ -158,7 +164,7 @@ void Logger::setOutput(OutputFunc func) {
 }
 
 void Logger::setFlush(FlushFunc func) {
-    g_output = func;
+    g_flush = func;
 }
 
 void Logger::setTimeZone(const TimeZone &tz) {

@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 //atomic integer class based on gcc marco definition
+
 namespace muduo {
     namespace detail {
         template<typename T>
@@ -16,38 +17,48 @@ namespace muduo {
         public:
             AtomicIntegerT() : value_(0) {}
 
+            //if value_ equals to 0, swap value_ and  0 ,and return value_
             T get() {
                 return __sync_val_compare_and_swap(&value_, 0, 0);
             }
 
+
+            //fetch value_ and add x to value_
             T getAndAdd(T x) {
                 return __sync_fetch_and_add(&value_, x);
             }
 
+            //add x to value_ and fetch value_
             T addAndGet(T x) {
                 return getAndAdd(x) + x;
             }
 
+            //add 1 to value_ and fetch value_
             T incrementAndGet() {
                 return addAndGet(1);
             }
 
+            //minus 1 from value_ and fetcho value_
             T decrementAndGet() {
                 return addAndGet(-1);
             }
 
+            //add x to value_
             void add(T x) {
                 getAndAdd(x);
             }
 
+            //add 1 to value_
             void increment() {
                 incrementAndGet();
             }
 
+            //minus 1 from value_
             void decrement() {
                 decrementAndGet();
             }
 
+            //get value_ and set newValue to value_
             T getAndSet(T newValue) {
                 return __sync_lock_test_and_set(&value_, newValue);
             }

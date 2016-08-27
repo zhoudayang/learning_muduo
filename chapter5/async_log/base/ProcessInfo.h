@@ -12,22 +12,29 @@
 
 namespace muduo {
     namespace ProcessInfo {
+        //查看进程pid
         pid_t pid();
 
+        //将进程pid转换为　string
         string pidString();
 
+        //获取用户id
         uid_t uid();
 
+        //获取用户名
         string username();
 
+        //获取用户euid
         uid_t euid();
 
+        //获取启动时间
         Timestamp startTime();
 
         int clockTicksPerSecond();
 
         int pageSize();
 
+        //is build with debug on ?
         bool isDebugBuild();
 
         string hostname();
@@ -42,6 +49,7 @@ namespace muduo {
 
         string exePath();
 
+        //获取打开的文件数量
         int openedFiles();
 
         int maxOpenFiles();
@@ -50,7 +58,7 @@ namespace muduo {
             double userSeconds;
             double systemSeconds;
 
-            CpuTime() : userSeconds(0.0), systemSeconds(0.0) { }
+            CpuTime() : userSeconds(0.0), systemSeconds(0.0) {}
         };
 
         CpuTime cpuTime();

@@ -9,15 +9,18 @@
 
 using namespace muduo;
 
-Exception::Exception(const char *msg) : message_(msg) {
+Exception::Exception(const char *msg)
+        : message_(msg) {
     fillStackTrace();
 }
 
-Exception::Exception(const string &msg) : message_(msg) {
+Exception::Exception(const string &msg)
+        : message_(msg) {
     fillStackTrace();
 }
 
-Exception::~Exception() throw() {}
+Exception::~Exception() throw() {
+}
 
 const char *Exception::what() const throw() {
     return message_.c_str();
@@ -33,10 +36,12 @@ void Exception::fillStackTrace() {
     int nptrs = ::backtrace(buffer, len);
     char **strings = ::backtrace_symbols(buffer, nptrs);
     if (strings) {
-        for (int i = 0; i < nptrs; i++) {
+        for (int i = 0; i < nptrs; ++i) {
+            // TODO demangle funcion name with abi::__cxa_demangle
             stack_.append(strings[i]);
-            stack_.push_back("\n");
+            stack_.push_back('\n');
         }
         free(strings);
     }
 }
+

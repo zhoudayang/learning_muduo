@@ -13,7 +13,7 @@
 using namespace muduo;
 
 LogFile::LogFile(const string &basename, size_t rollSize, bool threadSafe, int flushInterval, int checkEveryN)
-        : basename_(basename), rollSize_(rollsize), flushInterval_(flushInterval), checkEveryN_(checkEveryN), count_(0),
+        : basename_(basename), rollSize_(rollSize), flushInterval_(flushInterval), checkEveryN_(checkEveryN), count_(0),
           mutex_(threadSafe ? new MutexLock:NULL),
           startOfPeriod_(0), lastRoll_(0), lastFlush_(0) {
     assert(basename.find('/') == string::npos);
@@ -77,7 +77,7 @@ bool LogFile::rollFile() {
     return false;
 }
 
-string LogFile::getLogFileName(const string &basename, timt_t *now) {
+string LogFile::getLogFileName(const string &basename, time_t *now) {
     string filename;
     filename.reserve(basename.size() + 64);
     filename = basename;

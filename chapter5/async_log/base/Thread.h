@@ -16,7 +16,7 @@ namespace muduo {
 
         explicit Thread(const ThreadFunc &, const string &name = string());
 
-        explicit Thread(const ThreadFunc &&, const string &name = string());
+        explicit Thread(ThreadFunc &&, const string &name = string());
 
         ~Thread();
 

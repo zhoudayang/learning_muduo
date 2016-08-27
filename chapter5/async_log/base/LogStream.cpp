@@ -16,11 +16,6 @@
 using namespace muduo;
 using namespace muduo::detail;
 
-#if define(__clang__)
-#pragma  clang diagnostic ignored "-Wtautological-compare"
-#else
-#pragma GCC diagnostic ignores "-Wtype-limits"
-#endif
 namespace muduo {
     namespace detail {
         const char digits[] = "9876543210123456789";
@@ -46,7 +41,7 @@ namespace muduo {
             return p - buf;
         }
 
-        size_t convertHex(char buf, uintptr_t) {
+        size_t convertHex(char *buf, uintptr_t value) {
             uintptr_t i = value;
             char *p = buf;
             do {
@@ -68,7 +63,7 @@ namespace muduo {
 }
 
 template<int SIZE>
-constchar *FixedBuffer<SIZE>::debugString() {
+const char *FixedBuffer<SIZE>::debugString() {
     *cur_ = '\0';
     return data_;
 }
@@ -88,14 +83,14 @@ void LogStream::staticCheck() {
 }
 
 template<typename T>
-void LogStream::formatInteger(T) {
+void LogStream::formatInteger(T v) {
     if (buffer_.avail() >= kMaxNumericSize) {
         size_t len = convert(buffer_.current(), v);
         buffer_.add(len);
     }
 }
 
-LogStrean &LogStream::operator<<(short v) {
+LogStream &LogStream::operator<<(short v) {
     *this << static_cast<int>(v);
     return *this;
 }
@@ -143,7 +138,7 @@ LogStream &LogStream::operator<<(double v) {
     return *this;
 }
 
-LogStream &LogStream::operator<<(const void *) {
+LogStream &LogStream::operator<<(const void * p) {
     uintptr_t v = reinterpret_cast<uintptr_t >(p);
     if (buffer_.avail() >= kMaxNumericSize) {
         char *buf = buffer_.current();

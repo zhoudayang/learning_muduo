@@ -46,7 +46,7 @@ namespace muduo {
             return fromUnixTime(t, 0);
         }
 
-        static Timestamp fromUnixTime(timt_t t, int microseconds) {
+        static Timestamp fromUnixTime(time_t t, int microseconds) {
             return Timestamp(static_cast<int64_t>(t) * kMicroSecondsPerSecond + microseconds);
         }
 
@@ -67,7 +67,7 @@ namespace muduo {
         return lhs.microSecondsSinceEpoch() > rhs.microSecondsSinceEpoch();
     }
 
-    inline double timeDifferentce(Timestamp high, Timestamp low) {
+    inline double timeDifference(Timestamp high, Timestamp low) {
         int64_t diff = high.microSecondsSinceEpoch() - low.microSecondsSinceEpoch();
         return static_cast<double>(diff) / Timestamp::kMicroSecondsPerSecond;
     }

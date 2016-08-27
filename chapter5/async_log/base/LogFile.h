@@ -31,7 +31,7 @@ namespace muduo {
     private:
         void append_unlocked(const char *logline, int len);
 
-        static string getLogFileName(const string &basename, timt_t *now);
+        static string getLogFileName(const string &basename, time_t *now);
 
         const string basename_;
         const size_t rollSize_;

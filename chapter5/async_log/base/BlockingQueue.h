@@ -9,7 +9,10 @@
 #include <deque>
 #include <assert.h>
 #include "Mutex.h"
+#include "Condition.h"
+
 //blocking queue with any size
+
 namespace muduo {
     template<typename T>
     class BlockingQueue : boost::noncopyable {
@@ -21,7 +24,7 @@ namespace muduo {
             queue_.push_back(x);
             notEmpty_.notify();
         }
-        
+
         //右值引用版本
         void put(T &&x) {
             MutexLockGuard lock(mutex_);
@@ -29,6 +32,7 @@ namespace muduo {
             notEmpty_.notify();
         }
 
+        //take one elem from the top of the queue_
         T take() {
             MutexLockGuard lock(mutex_);
             while (queue_.empty()) {
@@ -40,6 +44,7 @@ namespace muduo {
             return front;
         }
 
+        //return the size of queue_
         size_t size() const {
             MutexLockGuard lock(mutex_);
             return queue_.size();

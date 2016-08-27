@@ -37,7 +37,7 @@ namespace muduo {
             explicit SourceFile(const char *filename) : data_(filename) {
                 const char *slash = strrchr(filename, '/');
                 if (slash) {
-                    data_ = slash_1;
+                    data_ = slash;
                 }
                 size_ = static_cast<int>(strlen(data_));
             }
@@ -63,7 +63,7 @@ namespace muduo {
 
         static LogLevel loglevel();
 
-        static void setLogLevel(Loglevel level);
+        static void setLogLevel(LogLevel level);
 
         typedef void(*OutputFunc)(const char *msg, int len);
 
@@ -80,7 +80,7 @@ namespace muduo {
         public:
             typedef Logger::LogLevel LogLevel;
 
-            Impl(LogLevel level, int old_errno, const SourceFile &file, int line);
+            Impl(LogLevel level, int savedErrno, const SourceFile &file, int line);
 
             void formatTime();
 
@@ -118,7 +118,7 @@ namespace muduo {
 #define CHECK_NOTNULL(val)\
 ::muduo::CehckNotNull(__FILE__,__LINE__,"'"#val"'Must be non NULL",(val))
 
-    const char *strerror_tl(int savedErrno);
+    const char* strerror_tl(int savedErrno);
 
     //A small helper for CHECK_NOTNULL()
     template<typename T>

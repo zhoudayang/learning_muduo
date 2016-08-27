@@ -15,7 +15,11 @@ namespace muduo {
     template<typename T>
     class BoundedBlockingQueue : boost::noncopyable {
     public:
-        BoundedBlockingQueue(int maxSize) : mutex_(), notEmpty_(mutex_), notFull_(mutex_), queue_(maxSize) {}
+        BoundedBlockingQueue(int maxSize) :
+                mutex_(),
+                notEmpty_(mutex_),
+                notFull_(mutex_),
+                queue_(maxSize) {}
 
         void put(const T &x) {
             MutexLockGuard lock(mutex_);

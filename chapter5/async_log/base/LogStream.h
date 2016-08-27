@@ -29,7 +29,7 @@ namespace muduo {
             }
 
             void append(const char * /*restrict*/ buf, size_t len) {
-                if (implicit_cast(size_t)(avail()) > len) {
+                if (implicit_cast<size_t>(avail()) > len) {
                     memcpy(cur_, buf, len);
                     cur_ += len;
                 }
@@ -70,7 +70,7 @@ namespace muduo {
             }
 
             string toString() const {
-                return string(data_, length_);
+                return string(data_, length());
             }
 
             StringPiece toStringPiece() const {
@@ -133,7 +133,7 @@ namespace muduo {
 
         self &operator<<(const char *str) {
             if (str) {
-                buffer_.append(str, strlen(Str));
+                buffer_.append(str, strlen(str));
             } else {
                 buffer_.append("(null)", 6);
             }
@@ -183,7 +183,7 @@ namespace muduo {
         void formatInteger(T);
 
         Buffer buffer_;
-        staic const int kMaxNumericSize = 32;
+        static const int kMaxNumericSize = 32;
     };
 
     class Fmt {

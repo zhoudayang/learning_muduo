@@ -20,7 +20,7 @@ AsyncLogging::AsyncLogging(const string &basename, size_t rollSize, int flushInt
           mutex_(),
           cond_(mutex_),
           currentBuffer_(new Buffer),
-          nextbuffer_(new Buffer),
+          nextBuffer_(new Buffer),
           buffers_() {
     currentBuffer_->bzero();
     nextBuffer_->bzero();
@@ -77,7 +77,7 @@ void AsyncLogging::threadFunc() {
             buffersToWrite.erase(buffersToWrite.begin() + 2, buffersToWrite.end());
         }
         for (size_t i = 0; i < buffersToWrite.size(); i++) {
-            output.append(buffersToWrite[i].date(), buffersToWrite[i].length())
+            output.append(buffersToWrite[i].data(), buffersToWrite[i].length());
         }
         if (buffersToWrite.size() > 2) {
             buffersToWrite.resize(2);

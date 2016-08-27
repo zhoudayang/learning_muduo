@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <sys/resource.h>
 #include <sys/times.h>
+#include <algorithm>
 
 namespace muduo {
 
@@ -78,6 +79,7 @@ string ProcessInfo::username() {
     return name;
 }
 
+
 uid_t ProcessInfo::euid() {
     return ::geteuid();
 }
@@ -107,8 +109,7 @@ string ProcessInfo::hostname() {
     if (::gethostname(buf, sizeof(buf)) == 0) {
         buf[sizeof(buf) - 1] = '\0';
         return buf;
-    }
-    else {
+    } else {
         return "unknownhost";
     }
 }
@@ -127,6 +128,7 @@ StringPiece ProcessInfo::procname(const string &stat) {
     return name;
 }
 
+//包含了所有CPU活跃的信息，该文件中的所有值都是从系统启动开始累计到当前时刻
 string ProcessInfo::procStatus() {
     string result;
     FileUtil::readFile("/proc/self/stat", 65536, &result);
@@ -172,7 +174,7 @@ ProcessInfo::CpuTime ProcessInfo::cpuTime() {
     if (::times(&tms) >= 0) {
         const double hz = static_cast<double>(clockTicksPerSecond());
         t.userSeconds = static_cast<double>(tms.tms_utime) / hz;
-        t.systemSeconds = static_cast<double>(tms.tms_time) / hz;
+        t.systemSeconds = static_cast<double>(tms.tms_stime) / hz;
     }
     return t;
 }
@@ -187,6 +189,7 @@ int ProcessInfo::numThreads() {
     return result;
 }
 
+//获取所有的线程，加入vector<pid_t> result中
 std::vector<pid_t> ProcessInfo::threads() {
     std::vector<pid_t> result;
     t_pids = &result;
