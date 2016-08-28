@@ -38,6 +38,7 @@ namespace muduo {
 
         static Timestamp now();
 
+        //return invalid Timestamp
         static Timestamp invalid() {
             return Timestamp();
         }
@@ -52,6 +53,7 @@ namespace muduo {
 
         static const int kMicroSecondsPerSecond = 1000 * 1000;
     private:
+        //毫秒
         int64_t microSecondsSinceEpoch_;
     };
 

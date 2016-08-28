@@ -9,10 +9,12 @@
 #include "Timestamp.h"
 
 namespace muduo {
+    // pre declare class TimeZone
     class TimeZone;
 
     class Logger {
     public:
+        //LogLevel
         enum LogLevel {
             TRACE,
             DEBUG,
@@ -23,10 +25,12 @@ namespace muduo {
             NUM_LOG_LEVELS,
         };
 
+        //class to store source file name
         class SourceFile {
         public:
             template<int N>
             inline SourceFile(const char (&arr)[N]):data_(arr), size_(N - 1) {
+                //从末尾开始向前查找 '/'
                 const char *slash = strrchr(data_, '/');
                 if (slash) {
                     data_ = slash + 1;
@@ -61,18 +65,26 @@ namespace muduo {
             return impl_.stream_;
         }
 
+        //return global log level
         static LogLevel loglevel();
 
+        //set global log level
         static void setLogLevel(LogLevel level);
 
+        //output function
         typedef void(*OutputFunc)(const char *msg, int len);
 
+
+        //flush function
         typedef void(*FlushFunc)();
 
+        //set output function
         static void setOutput(OutputFunc);
 
+        //set flush function
         static void setFlush(FlushFunc);
 
+        //set time zone
         static void setTimeZone(const TimeZone &tz);
 
     private:
@@ -85,11 +97,15 @@ namespace muduo {
             void formatTime();
 
             void finish();
-
+            //time
             Timestamp time_;
+            //log stream
             LogStream stream_;
+            //log level
             LogLevel level_;
+            //line number
             int line_;
+            //base of source file name
             SourceFile basename_;
         };
 

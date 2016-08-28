@@ -26,7 +26,7 @@ namespace muduo {
         //wait for condition to notify
         void wait() {
             MutexLock::UnassignGuard ug(mutex_);
-//            ug 对象被析构时，mutex_对象的holder_就绑定了thread的tid
+            //ug 对象被析构时，mutex_对象的holder_就被重置为0
             pthread_cond_wait(&pcond_, mutex_.getPthreadMutex());
         }
 

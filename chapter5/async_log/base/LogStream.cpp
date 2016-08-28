@@ -24,6 +24,7 @@ namespace muduo {
         const char digitsHex[] = "0123456789ABCDEF";
         BOOST_STATIC_ASSERT(sizeof(digitsHex) == 17);
 
+        //convert integer to char *
         template<typename T>
         size_t convert(char buf[], T value) {
             T i = value;
@@ -41,6 +42,7 @@ namespace muduo {
             return p - buf;
         }
 
+        //convert pointer to char *
         size_t convertHex(char *buf, uintptr_t value) {
             uintptr_t i = value;
             char *p = buf;
@@ -54,6 +56,7 @@ namespace muduo {
             return p - buf;
         }
 
+        //显示实例化
         template
         class FixedBuffer<kSmallBuffer>;
 
@@ -81,7 +84,7 @@ void LogStream::staticCheck() {
     BOOST_STATIC_ASSERT(kMaxNumericSize - 10 > std::numeric_limits<long long>::digits10);
 
 }
-
+//format Integer
 template<typename T>
 void LogStream::formatInteger(T v) {
     if (buffer_.avail() >= kMaxNumericSize) {
@@ -132,6 +135,7 @@ LogStream &LogStream::operator<<(unsigned long long v) {
 
 LogStream &LogStream::operator<<(double v) {
     if (buffer_.avail() >= kMaxNumericSize) {
+        //use snprintf function to convert double to char *
         int len = snprintf(buffer_.current(), kMaxNumericSize, "%.12g", v);
         buffer_.add(len);
     }

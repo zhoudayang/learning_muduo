@@ -1,7 +1,3 @@
-//
-// Created by fit on 16-8-25.
-//
-
 #include "Logging.h"
 #include "CurrentThread.h"
 #include "Timestamp.h"
@@ -16,14 +12,18 @@
 namespace muduo {
     __thread char t_errnobuf[512];
     __thread char t_time[32];
+    //cache last log second of time
     __thread time_t t_lastSecond;
 
+    //store meaning of errno to t_errnobuf
     const char *strerror_tl(int savedErrno) {
         return strerror_r(savedErrno, t_errnobuf, sizeof(t_errnobuf));
     }
 
     Logger::LogLevel initLogLevel() {
+        //if set env MUDUO_LOG_TRACE
         if (::getenv("MUDUO_LOG_TRACE"))
+            //set log level to TRACE
             return Logger::TRACE;
         else if (::getenv("MUDUO_LOG_DEBUG"))
             return Logger::DEBUG;
@@ -31,7 +31,9 @@ namespace muduo {
             return Logger::INFO;
     }
 
+    //init log level
     Logger::LogLevel g_logLevel = initLogLevel();
+
     const char *LogLevelName[Logger::NUM_LOG_LEVELS] = {
             "TRACE ",
             "DEBUG ",
@@ -57,16 +59,19 @@ namespace muduo {
         return s;
     }
 
+    //append source file name
     inline LogStream &operator<<(LogStream &s, const Logger::SourceFile &v) {
         s.append(v.data_, v.size_);
         return s;
     }
 
+    //default output function, output to stdout
     void defaultOutput(const char *msg, int len) {
         size_t n = fwrite(msg, 1, len, stdout);
         (void) n;
     }
 
+    //default stdout, flush stdout
     void defaultFlush() {
         ::fflush(stdout);
     }
@@ -83,18 +88,20 @@ Logger::Impl::Impl(LogLevel level, int savedErrno, const SourceFile &file, int l
           stream_(),
           level_(level),
           line_(line),
-          basename_(file)
-{
+          basename_(file) {
     formatTime();
     CurrentThread::tid();
+    //append tid string
     stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
+    //append log level name
     stream_ << T(LogLevelName[level], 6);
-    if (savedErrno != 0)
-    {
+    if (savedErrno != 0) {
+        //append error info
         stream_ << strerror_tl(savedErrno) << " (errno=" << savedErrno << ") ";
     }
 }
 
+//how to format time
 void Logger::Impl::formatTime() {
     int64_t microSecondsSinceEpoch = time_.microSecondsSinceEpoch();
     time_t seconds = static_cast<time_t>(microSecondsSinceEpoch / Timestamp::kMicroSecondsPerSecond);
@@ -126,6 +133,7 @@ void Logger::Impl::formatTime() {
     }
 }
 
+//add finish string
 void Logger::Impl::finish() {
     stream_ << " - " << basename_ << ":" << line_ << "\n";
 }
@@ -134,6 +142,7 @@ Logger::Logger(SourceFile file, int line) : impl_(INFO, 0, file, line) {}
 
 Logger::Logger(SourceFile file, int line, LogLevel level, const char *func) :
         impl_(level, 0, file, line) {
+    //append function name
     impl_.stream_ << func << ' ';
 }
 
@@ -146,9 +155,12 @@ Logger::Logger(SourceFile file, int line, bool toAbort) :
         impl_(toAbort ? FATAL : ERROR, errno, file, line) {}
 
 Logger::~Logger() {
+    //call finish function, and finish string
     impl_.finish();
     const LogStream::Buffer &buf(stream().buffer());
+    //output buffer
     g_output(buf.data(), buf.length());
+    //if fatal, abort to exit the software
     if (impl_.level_ == FATAL) {
         g_flush();
         abort();

@@ -39,6 +39,7 @@ string Timestamp::toFormattedString(bool showMicrosecond) const {
                  tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec,
                  microseconds);
     } else {
+        //don't show microseconds
         snprintf(buf, sizeof(buf), "%4d%02d%02d %02d:%02d:%02d",
                  tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,
                  tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);
@@ -48,7 +49,9 @@ string Timestamp::toFormattedString(bool showMicrosecond) const {
 
 Timestamp Timestamp::now() {
     struct timeval tv;
+    //使用gettimeofday 用户态调用获取当前系统时间
     gettimeofday(&tv, NULL);
+    //get seconds
     int64_t seconds = tv.tv_sec;
     return Timestamp(seconds * kMicroSecondsPerSecond + tv.tv_usec);
 }

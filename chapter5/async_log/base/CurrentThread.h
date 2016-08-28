@@ -5,15 +5,21 @@
 
 namespace muduo {
     namespace CurrentThread {
+        //cache thread tid
         extern __thread int t_cachedTid;
+        //thread tid name
         extern __thread char t_tidString[32];
+        //the length of t_tidString
         extern __thread int t_tidStringLength;
+        //thread name
         extern __thread const char *t_threadName;
 
         void cacheTid();
 
         inline int tid() {
+            //t_cacheTid 为０的可能性极小，请编译器在此基础上进行编译优化
             if (__builtin_expect(t_cachedTid == 0, 0)) {
+                //缓存　线程 id
                 cacheTid();
             }
             return t_cachedTid;
@@ -31,8 +37,10 @@ namespace muduo {
             return t_threadName;
         }
 
+        //if is main thread? only if thread pid equals to process pid
         bool isMainThread();
 
+        //sleep for usec 微秒
         void sleepUsec(int64_t usec);
     }
 

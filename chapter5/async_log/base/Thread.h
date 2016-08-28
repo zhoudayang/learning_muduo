@@ -12,6 +12,7 @@
 namespace muduo {
     class Thread : boost::noncopyable {
     public:
+        // thread function run in thread
         typedef boost::function<void()> ThreadFunc;
 
         explicit Thread(const ThreadFunc &, const string &name = string());
@@ -20,8 +21,12 @@ namespace muduo {
 
         ~Thread();
 
+        //start thread
         void start();
+
+        //join the thread, block to wait for thread end
         int join();
+
         bool started() const {
             return started_;
         }
@@ -29,12 +34,15 @@ namespace muduo {
         pid_t tid() const {
             return *tid_;
         }
-        const string &name() const{
+
+        const string &name() const {
             return name_;
         }
-        static int numCreated(){
+
+        static int numCreated() {
             return numCreated_.get();
         }
+
     private:
         void setDefaultName();
 
@@ -44,6 +52,7 @@ namespace muduo {
         boost::shared_ptr<pid_t> tid_;
         ThreadFunc func_;
         string name_;
+        //the num of thread
         static AtomicInt32 numCreated_;
     };
 

@@ -13,10 +13,13 @@ namespace muduo {
     public:
         explicit CountDownLatch(int count);
 
+        //wait for count_ to become zero
         void wait();
 
+        //decrease the count_
         void countDown();
 
+        //return count_
         int getCount() const;
 
     private:

@@ -86,6 +86,7 @@ namespace muduo {
 
     class MutexLockGuard : boost::noncopyable {
     public:
+        //此处必须为引用
         explicit MutexLockGuard(MutexLock &mutex) : mutex_(mutex) {
             mutex_.lock();
         }

@@ -14,9 +14,12 @@
 
 namespace muduo {
     namespace detail {
+        //small buffer size
         const int kSmallBuffer = 4000;
+        //large buffer size
         const int kLargeBuffer = 4000 * 1000;
 
+        //fixed size buffer
         template<int SIZE>
         class FixedBuffer : boost::noncopyable {
         public:
@@ -28,6 +31,7 @@ namespace muduo {
                 setCookie(cookieEnd);
             }
 
+            //append buf of size len after cur_
             void append(const char * /*restrict*/ buf, size_t len) {
                 if (implicit_cast<size_t>(avail()) > len) {
                     memcpy(cur_, buf, len);
@@ -35,49 +39,63 @@ namespace muduo {
                 }
             }
 
+            //return data_
             const char *data() const {
                 return data_;
             }
 
+            //return length
             int length() const {
                 return static_cast<int>(cur_ - data_);
             }
 
+            //return current point
             char *current() {
                 return cur_;
             }
 
+
+            //return avaliable capacity
             int avail() const {
                 return static_cast<int>(end() - cur_);
             }
 
+
+            //forward cur_ to length len
             void add(size_t len) {
                 cur_ += len;
             }
 
+            //reset point to front
             void reset() {
                 cur_ = data_;
             }
 
+            //set cur_ to '\0' and return data_
             const char *debugString();
 
+            //memset data_
             void bzero() {
                 ::bzero(data_, sizeof data_);
             }
 
+            //set cookie function
             void setCookie(void(*cookie)()) {
                 cookie_ = cookie;
             }
 
+            //convert data_ to string
             string toString() const {
                 return string(data_, length());
             }
 
+            //convert data_ to StringPiece
             StringPiece toStringPiece() const {
                 return StringPiece(data_, length());
             }
 
         private:
+            //return end elem of data_
             const char *end() const {
                 return data_ + sizeof data_;
             }
@@ -95,8 +113,10 @@ namespace muduo {
     class LogStream : boost::noncopyable {
         typedef LogStream self;
     public:
+        //buffer with small size
         typedef detail::FixedBuffer<detail::kSmallBuffer> Buffer;
 
+        //append bool element
         self &operator<<(bool v) {
             buffer_.append(v ? "1" : "0", 1);
             return *this;
@@ -117,7 +137,8 @@ namespace muduo {
         self &operator<<(long long);
 
         self &operator<<(unsigned long long);
-        self &operator <<(const void *);
+
+        self &operator<<(const void *);
 
         self &operator<<(float v) {
             *this << static_cast<double> (v);
@@ -202,6 +223,7 @@ namespace muduo {
         int length_;
     };
 
+    // append fmt to LogStream
     inline LogStream &operator<<(LogStream &s, const Fmt &fmt) {
         s.append(fmt.data(), fmt.length());
         return s;

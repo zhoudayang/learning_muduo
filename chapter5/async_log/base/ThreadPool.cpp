@@ -51,7 +51,7 @@ void ThreadPool::stop() {
     {
         MutexLockGuard lock(mutex_);
         //key code here!
-        //set running_ to false
+        //set running_ to false, runInThread function don't take task from queue_ anymore
         running_ = false;
         ////唤醒等待queue_中元素的每个线程,其中take函数中的循环因为running_为false而暂停，立即返回一个值为空的Task对象，因为
         ////该对象为空，线程不运行任何function，直接返回　
@@ -68,19 +68,24 @@ size_t ThreadPool::queueSize() const {
 }
 
 void ThreadPool::run(const Task &task) {
+    //if threads_ size is empty, run task immediately
     if (threads_.empty()) {
         task();
     } else {
         MutexLockGuard lock(mutex_);
+        //wait for not full
         while (isFull()) {
             notFull_.wait();
         }
         assert(!isFull());
+        // push task function into queue_
         queue_.push_back(task);
+        // now queue_ is not empty
         notEmpty_.notify();
     }
 }
 
+//右值引用版本
 void ThreadPool::run(const Task &&task) {
     if (threads_.empty()) {
         task();
@@ -127,6 +132,7 @@ void ThreadPool::runInThread() {
             //before run the function, run the threadInitCallback_　function first if it exists
             threadInitCallback_();
         }
+        // while running the thread
         while (running_) {
             //take function from queue_ to run it
             Task task(take());

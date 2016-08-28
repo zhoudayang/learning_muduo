@@ -19,11 +19,14 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 
+//这一段代码值得看上百遍！
+
 namespace muduo {
     class AsyncLogging : boost::noncopyable {
     public:
         AsyncLogging(const string &basename, size_t rollSize, int flushInterval = 3);
 
+        //stop log to exit
         ~AsyncLogging() {
             if (running_) {
                 stop();
@@ -35,24 +38,28 @@ namespace muduo {
         void start() {
             running_ = true;
             thread_.start();
+            //wait for threadFunc begin to run to count down the latch_
             latch_.wait();
         }
 
         void stop() {
             running_ = false;
+            //notify threadFunc to write currentBuffer_ to file
             cond_.notify();
+            //wait for threadFunc to exit
             thread_.join();
         }
 
     private:
         //declare but not define, prevent compiler-synthesized functions
-        AsyncLogging(const AsyncLogging &);
+        AsyncLogging(const AsyncLogging &) = delete;
 
-        void operator=(const AsyncLogging &);
+        void operator=(const AsyncLogging &) = delete;
 
         void threadFunc();
 
         typedef muduo::detail::FixedBuffer<muduo::detail::kLargeBuffer> Buffer;
+        //type of BufferVector
         typedef boost::ptr_vector<Buffer> BufferVector;
         typedef BufferVector::auto_type BufferPtr;
 

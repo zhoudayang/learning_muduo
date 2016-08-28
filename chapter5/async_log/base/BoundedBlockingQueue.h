@@ -21,6 +21,7 @@ namespace muduo {
                 notFull_(mutex_),
                 queue_(maxSize) {}
 
+        //put x into queue_
         void put(const T &x) {
             MutexLockGuard lock(mutex_);
             while (queue_.full()) {
@@ -31,6 +32,7 @@ namespace muduo {
             notEmpty_.notify();
         }
 
+        //右值引用版本
         void put(const T &&x) {
             MutexLockGuard lock(mutex_);
             while (queue_.full()) {
@@ -41,6 +43,7 @@ namespace muduo {
             notEmpty_.notify();
         }
 
+        //return front elem of queue_
         T take() {
             MutexLockGuard lock(mutex_);
             while (queue_.empty()) {

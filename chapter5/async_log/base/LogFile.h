@@ -13,6 +13,7 @@
 
 namespace muduo {
     namespace FileUtil {
+        //pre declare AppendFile class
         class AppendFile;
     }
     class LogFile : boost::noncopyable {

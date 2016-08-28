@@ -36,7 +36,7 @@ namespace muduo {
             threadInitCallback_ = cb;
         }
 
-        //start run thread pool
+        //start run thread pool with size of numThreads
         void start(int numThreads);
 
         //stop every function of thread pool

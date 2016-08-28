@@ -26,9 +26,11 @@ namespace muduo {
         __thread int t_tidStringLength = 6;
         __thread const char *t_threadName = "unknown";
         const bool sameType = boost::is_same<int, pid_t>::value;
+        // assert pid_t type is int
         BOOST_STATIC_ASSERT(sameType);
     }
     namespace detail {
+        //get thread tid
         pid_t gettid() {
             return static_cast<pid_t>(::syscall(SYS_gettid));
         }
@@ -45,6 +47,7 @@ namespace muduo {
             ThreadNameInitializer() {
                 muduo::CurrentThread::t_threadName = "main";
                 CurrentThread::tid();
+                //call afterFork function after fork
                 pthread_atfork(NULL, NULL, &afterFork);
             }
         };
@@ -58,19 +61,22 @@ namespace muduo {
             boost::weak_ptr<pid_t> wkTid_;
 
             ThreadData(const ThreadFunc &func, const string &name, const boost::shared_ptr<pid_t> &tid) :
-                    func_(func), name_(name), wkTid_(tid) { }
+                    func_(func), name_(name), wkTid_(tid) {}
 
             void runInThread() {
                 pid_t tid = muduo::CurrentThread::tid();
                 boost::shared_ptr<pid_t> ptid = wkTid_.lock();
+                //set thread tid
                 if (ptid) {
                     *ptid = tid;
+                    //减少ptid的引用计数
                     ptid.reset();
                 }
                 muduo::CurrentThread::t_threadName = name_.empty() ? "muduoThread" : name_.c_str();
                 //PR_SET_NAME :把参数arg2作为调用进程的名字
                 ::prctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);
                 try {
+                    //call function
                     func_();
                     muduo::CurrentThread::t_threadName = "finished";
                 } catch (const Exception &ex) {
@@ -95,6 +101,7 @@ namespace muduo {
         };
 
         void *startThread(void *obj) {
+            //function run after start thread
             ThreadData *data = static_cast<ThreadData *>(obj);
             data->runInThread();
             delete data;
@@ -150,10 +157,12 @@ void Thread::setDefaultName() {
     }
 }
 
+//start the thread
 void Thread::start() {
     assert(!started_);
     started_ = true;
     detail::ThreadData *data = new detail::ThreadData(func_, name_, tid_);
+    //call startThread function in thread
     if (pthread_create(&pthreadId_, NULL, &detail::startThread, data)) {
         started_ = false;
         delete data;

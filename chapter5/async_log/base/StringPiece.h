@@ -9,7 +9,7 @@
 #include <iosfwd>
 #include "Types.h"
 #include <string>
-
+//String 工具类
 namespace muduo {
     class StringArg {
     public:
@@ -120,6 +120,7 @@ namespace muduo {
         }
 
         void CopyToString(string *target) const {
+            //copy ptr_ with length to target
             target->assign(ptr_, length_);
         }
 
