@@ -67,6 +67,7 @@ namespace muduo {
             volatile T value_;
         };
     }
+    //声明类型
     typedef detail::AtomicIntegerT<int32_t> AtomicInt32;
     typedef detail::AtomicIntegerT<int64_t> AtomicInt64;
 }

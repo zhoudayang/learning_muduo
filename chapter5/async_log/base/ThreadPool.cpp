@@ -91,10 +91,12 @@ void ThreadPool::run(const Task &&task) {
         task();
     } else {
         MutexLockGuard lock(mutex_);
+        //wait for not full
         while (isFull()) {
             notFull_.wait();
         }
         assert(!isFull());
+        // add task function into queue_
         queue_.push_back(std::move(task));
         notEmpty_.notify();
     }
@@ -104,6 +106,7 @@ void ThreadPool::run(const Task &&task) {
 ThreadPool::Task ThreadPool::take() {
     MutexLockGuard lock(mutex_);
     //queue_ is empty ,wait for next one
+    //if not running now, just return immediately
     while (queue_.empty() && running_) {
         notEmpty_.wait();
     }
@@ -125,7 +128,7 @@ bool ThreadPool::isFull() const {
     return maxQueueSize_ > 0 and queue_.size() >= maxQueueSize_;
 }
 
-
+// main function run in each thread of thread pool
 void ThreadPool::runInThread() {
     try {
         if (threadInitCallback_) {

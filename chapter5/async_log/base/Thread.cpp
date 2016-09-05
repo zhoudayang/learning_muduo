@@ -63,6 +63,7 @@ namespace muduo {
             ThreadData(const ThreadFunc &func, const string &name, const boost::shared_ptr<pid_t> &tid) :
                     func_(func), name_(name), wkTid_(tid) {}
 
+            //run this function in the thread
             void runInThread() {
                 pid_t tid = muduo::CurrentThread::tid();
                 boost::shared_ptr<pid_t> ptid = wkTid_.lock();

@@ -33,15 +33,18 @@ AsyncLogging::AsyncLogging(const string &basename, size_t rollSize, int flushInt
 //may be called by multi thread!
 void AsyncLogging::append(const char *logline, int len) {
     muduo::MutexLockGuard lock(mutex_);
+    //如果当前的buffer剩余空间足够，讲logline 加入buffer中
     if (currentBuffer_->avail() > len) {
         currentBuffer_->append(logline, len);
     } else {
         buffers_.push_back(currentBuffer_.release());
         if (nextBuffer_) {
+            //move next Buffer to replace current buffer
             currentBuffer_ = boost::ptr_container::move(nextBuffer_);
         }
         else
         {
+            //reset current buffer to new buffer
             currentBuffer_.reset(new Buffer);
         }
         currentBuffer_->append(logline, len);
@@ -90,6 +93,7 @@ void AsyncLogging::threadFunc() {
             fputs(buf, stderr);
             output.append(buf, static_cast<int>(strlen(buf)));
             //erase begin +2 to end of the vector
+            //保留两个元素用于 后面初始化newBuffer1 和 newBuffer2
             buffersToWrite.erase(buffersToWrite.begin() + 2, buffersToWrite.end());
         }
         for (size_t i = 0; i < buffersToWrite.size(); i++) {
@@ -112,7 +116,9 @@ void AsyncLogging::threadFunc() {
             newBuffer2 = buffersToWrite.pop_back();
             newBuffer2->reset();
         }
+        //clear write buffer
         buffersToWrite.clear();
+        //flush ouput flow
         output.flush();
     }
     //exit thread func, flush again

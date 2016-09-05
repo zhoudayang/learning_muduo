@@ -41,7 +41,7 @@ namespace muduo {
             explicit SourceFile(const char *filename) : data_(filename) {
                 const char *slash = strrchr(filename, '/');
                 if (slash) {
-                    data_ = slash;
+                    data_ = slash+1;
                 }
                 size_ = static_cast<int>(strlen(data_));
             }
@@ -132,7 +132,7 @@ namespace muduo {
 #define LOG_SYSFATAL muduo::Logger(__FILE__,__LINE__,true).stream()
 
 #define CHECK_NOTNULL(val)\
-::muduo::CehckNotNull(__FILE__,__LINE__,"'"#val"'Must be non NULL",(val))
+::muduo::CheckNotNull(__FILE__,__LINE__,"'"#val"'Must be non NULL",(val))
 
     const char* strerror_tl(int savedErrno);
 

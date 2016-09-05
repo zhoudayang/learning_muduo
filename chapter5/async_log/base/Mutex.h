@@ -107,4 +107,5 @@ namespace muduo {
 //MutexLockGuard(mutex_)
 //A tempory object doesn't hold the lock for long!
 #define MutexLockGuard(x) error "Missing guard object name"
+
 #endif
