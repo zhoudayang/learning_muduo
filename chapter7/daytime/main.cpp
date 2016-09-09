@@ -1,4 +1,3 @@
-#include "daytime.h"
 
 #include <muduo/base/Logging.h>
 #include <muduo/net/EventLoop.h>
@@ -27,14 +26,16 @@ using namespace muduo::net;
 
 DaytimeServer::DaytimeServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &listenAddr)
         : server_(loop, listenAddr, "DaytimeServer") {
+    //set connection callback function
     server_.setConnectionCallback(
             boost::bind(&DaytimeServer::onConnection, this, _1)
     );
+    //set message callback function
     server_.setMessageCallback(
             boost::bind(&DaytimeServer::onMessage, this, _1, _2, _3)
     );
 }
-
+//start daytime server
 void DaytimeServer::start() {
     server_.start();
 }
@@ -44,10 +45,12 @@ void DaytimeServer::onConnection(const muduo::net::TcpConnectionPtr &con) {
              " is " << (con->connected() ? "up" : "down");
     if (con->connected()) {
         con->send(Timestamp::now().toFormattedString() + "\n");
+        //close the connection
         con->shutdown();
     }
 }
 
+//receive mesage from client and discard it
 void DaytimeServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
                               muduo::Timestamp time) {
     string msg(buf->retrieveAllAsString());
