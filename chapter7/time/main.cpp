@@ -50,6 +50,7 @@ void TimeServer::onConnection(const muduo::net::TcpConnectionPtr &con) {
         time_t now = ::time(NULL);
         int32_t be32 = sockets::hostToNetwork32(static_cast<int32_t >(now));
         con->send(&be32, sizeof(be32));
+        //close connection after send the time data
         con->shutdown();
     }
 }
@@ -59,7 +60,8 @@ void TimeServer::onMessage(const muduo::net::TcpConnectionPtr &con, muduo::net::
     LOG_INFO << con->name()
              << " discards "
              << msg.size()
-             << " bytes received at " << time.toString();
+             << " bytes received at "
+             << time.toString();
 }
 
 int main() {
