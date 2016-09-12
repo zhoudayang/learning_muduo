@@ -19,6 +19,7 @@ public:
             : server_(loop, listenAddr, "ChatServer"),
               codec_(boost::bind(&ChatServer::onStringMessage, this, _1, _2, _3)) {
         server_.setConnectionCallback(boost::bind(&ChatServer::onConnection, this, _1));
+        //发送消息时，会调用LengthHeaderCodec中的消息发送函数，自动进行消息的打包处理
         server_.setMessageCallback((boost::bind(&LengthHeaderCodec::onMessage, &codec_, _1, _2, _3)));
 
     }
@@ -32,6 +33,7 @@ private:
         LOG_INFO << con->localAddress().toIpPort() << " -> "
                  << con->peerAddress().toIpPort() << " is "
                  << (con->connected() ? "up" : "down");
+        //if client build the connection, add TcpConnectionPtr to set, else if client close the connection, erase it from the set
         if (con->connected()) {
             connections_.insert(con);
         }
@@ -43,13 +45,16 @@ private:
     void onStringMessage(const TcpConnectionPtr &con, const string &message, Timestamp time) {
         //向所有的客户端发送消息
         for (ConnectionList::iterator it = connections_.begin(); it != connections_.end(); it++) {
+            //此处调用了消息处理中间件中的消息发送函数
             codec_.send(get_pointer(*it), message);
         }
     }
 
     typedef std::set<TcpConnectionPtr> ConnectionList;
     TcpServer server_;
+    //消息处理中间件
     LengthHeaderCodec codec_;
+    //存放所有建立的连接
     ConnectionList connections_;
 };
 

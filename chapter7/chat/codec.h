@@ -25,9 +25,11 @@ public:
 
     }
 
+    //服务器处理消息时会调用此函数
     void onMessage(const muduo::net::TcpConnectionPtr &con, muduo::net::Buffer *buf, muduo::Timestamp receiveTime) {
         //可读的数据长度大于头的长度
         while (buf->readableBytes() >= kHeaderLen) {
+            //获取数据长度标志
             const void *data = buf->peek();
             int32_t be32 = *static_cast<const int32_t *>(data);
             const int32_t len = muduo::net::sockets::networkToHost32(be32);
@@ -37,17 +39,20 @@ public:
                 con->shutdown();
                 break;
             }
+                //可读的数据长度大于一个数据报，读取这个数据报，并调用消息回调函数
             else if (buf->readableBytes() >= len + kHeaderLen) {
                 buf->retrieve(kHeaderLen);
                 muduo::string message(buf->peek(), len);
+                //call message callback function in ChatServer
                 messageCallback_(con, message, receiveTime);
+                //set read index to right pos
                 buf->retrieve(len);
             }
             else
                 break;
         }
     }
-
+    //发送数据会调用此函数，自动在数据报前面加上消息长度标志，并发送消息
     void send(muduo::net::TcpConnection *con, const muduo::StringPiece &message) {
         muduo::net::Buffer buf;
         buf.append(message.data(), message.size());
@@ -61,6 +66,7 @@ public:
 
 private:
     StringMessageCallback messageCallback_;
+    //消息头长度
     const static size_t kHeaderLen = sizeof(int32_t);
 };
 

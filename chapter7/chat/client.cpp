@@ -20,7 +20,9 @@ public:
             : client_(loop, serverAddr, "ChatClient"),
               codec_(boost::bind(&ChatClient::onStringMessage, this, _1, _2, _3)) {
         client_.setConnectionCallback(boost::bind(&ChatClient::onConnection, this, _1));
+        //bind message callback function to LengthHeaderCodec onMessage
         client_.setMessageCallback(boost::bind(&LengthHeaderCodec::onMessage, &codec_, _1, _2, _3));
+        //关闭nagle算法，保证数据包立即发送，避免产生延时
         client_.enableRetry();
     }
 
@@ -32,9 +34,11 @@ public:
         client_.disconnect();
     }
 
+    //write 会由main线程来调用，所以需要加锁来保护shared_ptr
     void write(const StringPiece &message) {
         //这个锁是为了保护shared_ptr
         MutexLockGuard lock(mutex_);
+        //if connection_ is valid, send message to server
         if (connection_) {
             codec_.send(get_pointer(connection_), message);
         }
@@ -49,9 +53,11 @@ private:
         MutexLockGuard lock(mutex_);
         if (con->connected())
             connection_ = con;
+            //if server close the connection, reset connection_
         else
             connection_.reset();
     }
+
     //输出服务器发送的消息
     void onStringMessage(const TcpConnectionPtr &con, const string &message, Timestamp time) {
         printf("<<< %s\n", message.c_str());
@@ -73,9 +79,10 @@ int main() {
     client.connect();
     std::string line;
     while (std::getline(std::cin, line)) {
+        //call write function in main thread
         client.write(line);
     }
     client.disconnect();
-    //wait for disconnect
+    //等待连接完全断开
     CurrentThread::sleepUsec(1000 * 1000);
 }
