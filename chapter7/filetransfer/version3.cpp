@@ -8,7 +8,7 @@
 
 using namespace muduo;
 using namespace muduo::net;
-
+//fixme: an bug! double free
 //print buffer size
 void onHighWaterMark(const TcpConnectionPtr &con, size_t len) {
     LOG_INFO << "HighWaterMark " << len;
