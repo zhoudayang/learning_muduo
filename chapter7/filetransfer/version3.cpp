@@ -9,7 +9,7 @@
 using namespace muduo;
 using namespace muduo::net;
 
-
+//print buffer size
 void onHighWaterMark(const TcpConnectionPtr &con, size_t len) {
     LOG_INFO << "HighWaterMark " << len;
 }
@@ -24,6 +24,7 @@ void onConnection(const TcpConnectionPtr &con) {
     con->setHighWaterMarkCallback(onHighWaterMark, kBufSize + 1);
     FILE *fp = ::fopen(g_file, "rb");
     if (fp) {
+        ///使用shared_ptr 的 custom delete 来减轻资源管理负担， 使得FILE *的生命周期和TcpConnection 一样长，简化代码实现
         FilePtr ctx(fp, ::fclose);
         con->setContext(ctx);
         char buf[kBufSize];
@@ -41,7 +42,6 @@ void onWriteComplete(const TcpConnectionPtr &con) {
     size_t nread = ::fread(buf, 1, sizeof buf, get_pointer(fp));
     if (nread > 0) {
         con->send(buf, static_cast<int>(nread));
-
     }
     else {
         con->shutdown();
@@ -51,7 +51,7 @@ void onWriteComplete(const TcpConnectionPtr &con) {
 
 int main() {
     LOG_INFO << "pid=" << getpid();
-    g_file = "/home/zhouyang/Downloads/file";
+    g_file = "/home/zhouyang/file";
     EventLoop loop;
     InetAddress listenAddr(2016);
     TcpServer server(&loop, listenAddr, "FileServer");

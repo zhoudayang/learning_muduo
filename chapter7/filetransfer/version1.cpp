@@ -1,10 +1,8 @@
-//版本一，在简历连接之后，将文件的全部内容读入一个string中，
-// 一次调用TcpConnection::send() 进行发送。不用担心文件发送不完整，也不用担心
-//send()之后立刻shutdown()会有什么问题
+//版本一，在建立连接之后，将文件的全部内容读入一个string中，
+// 一次调用TcpConnection::send() 进行发送。不用担心文件发送不完整，也不用担心send()之后立刻shutdown()会有什么问题
 #include <muduo/base/Logging.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/TcpServer.h>
-
 #include <stdio.h>
 
 using namespace muduo;
@@ -19,6 +17,7 @@ string readFile(const char *filename) {
     if (fp) {
         const int kBufSize = 1024 * 2014;
         char iobuf[kBufSize];
+        //set buffer to IO operation
         ::setbuffer(fp, iobuf, sizeof iobuf);
         char buf[kBufSize];
         size_t nread = 0;
@@ -30,7 +29,6 @@ string readFile(const char *filename) {
 };
 
 void onHighWaterMark(const TcpConnectionPtr &con, size_t len) {
-
     LOG_INFO << "HighWaterMark " << len;
 }
 
@@ -55,12 +53,15 @@ void onConnection(const TcpConnectionPtr &con) {
 
 int main() {
     LOG_INFO << " pid= " << getpid();
-    g_file = "/home/zhouyang/Downloads/file";
+    g_file = "/home/zhouyang/file";
     EventLoop loop;
     InetAddress listenAddr(2016);
     TcpServer server(&loop, listenAddr, "FileServer");
+    //set connection callback function
     server.setConnectionCallback(onConnection);
+    //start server
     server.start();
+    //start eventloop
     loop.loop();
 
 }
