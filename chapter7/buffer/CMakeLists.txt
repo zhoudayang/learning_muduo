@@ -1,3 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
-set(SOURCE_CODE copyable.h StringPiece.h Types.h Endian.h Buffer.cpp  main.cpp)
+project(buffer)
+add_subdirectory(base)
+set(SOURCE_CODE  Buffer.cpp  main.cpp SocketsOps.cpp Endian.h)
 add_executable(test_case ${SOURCE_CODE})
+target_link_libraries(test_case base boost_unit_test_framework)
