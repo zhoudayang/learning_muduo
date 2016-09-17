@@ -45,25 +45,39 @@ namespace muduo
                 assert(prependableBytes() == kCheapPrepend);
             }
 
+            void swap(Buffer &&rhs){
+                std::vector <char> buf = std::move(rhs.buffer_);
+                std::swap(rhs.readerIndex_,readerIndex_);
+                std::swap(rhs.writerIndex_,writerIndex_);
+                buffer_ = std::move(buf);
+                rhs.buffer_ = std::move(buf);
+            }
+
+
             // implicit copy-ctor, move-ctor, dtor and assignment are fine
             // NOTE: implicit move-ctor is added in g++ 4.6
 
             void swap(Buffer& rhs)
             {
+                Buffer temp(std::move(rhs));
                 buffer_.swap(rhs.buffer_);
                 std::swap(readerIndex_, rhs.readerIndex_);
                 std::swap(writerIndex_, rhs.writerIndex_);
             }
 
+            //可读的buffer 大小
             size_t readableBytes() const
             { return writerIndex_ - readerIndex_; }
 
+            //可写的buffer 大小
             size_t writableBytes() const
             { return buffer_.size() - writerIndex_; }
 
+            //可以用于prepend的空间大小
             size_t prependableBytes() const
             { return readerIndex_; }
 
+            //获取readerIndex_ 所在的指针
             const char* peek() const
             { return begin() + readerIndex_; }
 
@@ -183,8 +197,10 @@ namespace muduo
 
             void ensureWritableBytes(size_t len)
             {
+                //如果可写的空间小于len
                 if (writableBytes() < len)
                 {
+                    // 开辟空间
                     makeSpace(len);
                 }
                 assert(writableBytes() >= len);
@@ -196,12 +212,14 @@ namespace muduo
             const char* beginWrite() const
             { return begin() + writerIndex_; }
 
+            //set writerIndex_ forward len pos
             void hasWritten(size_t len)
             {
                 assert(len <= writableBytes());
                 writerIndex_ += len;
             }
 
+            //set writerIndex_ back len pos
             void unwrite(size_t len)
             {
                 assert(len <= readableBytes());
@@ -261,7 +279,9 @@ namespace muduo
 
             int16_t readInt16()
             {
+                // 首先取出数据
                 int16_t result = peekInt16();
+                // 然后重新设置readerIndex_和writerIndex_
                 retrieveInt16();
                 return result;
             }
@@ -344,18 +364,22 @@ namespace muduo
             void prepend(const void* /*restrict*/ data, size_t len)
             {
                 assert(len <= prependableBytes());
+                //将读指针前移len位置
                 readerIndex_ -= len;
                 const char* d = static_cast<const char*>(data);
+                //将数据复制进入prepend位置
                 std::copy(d, d+len, begin()+readerIndex_);
+                //此时无需变动readerIndex_位置，因为新增的内容需要转发到网络
             }
 
             void shrink(size_t reserve)
             {
                 // FIXME: use vector::shrink_to_fit() in C++ 11 if possible.
+                // shrink to fit make size equal to capacity
                 Buffer other;
                 other.ensureWritableBytes(readableBytes()+reserve);
                 other.append(toStringPiece());
-                swap(other);
+                swap(std::move(other));
             }
 
             size_t internalCapacity() const
@@ -368,7 +392,6 @@ namespace muduo
             /// It may implement with readv(2)
             /// @return result of read(2), @c errno is saved
             ssize_t readFd(int fd, int* savedErrno);
-
         private:
 
             char* begin()
@@ -389,14 +412,17 @@ namespace muduo
                     // move readable data to the front, make space inside buffer
                     assert(kCheapPrepend < readerIndex_);
                     size_t readable = readableBytes();
+                    //将[begin()+readeIndex_,begin()+writerIndex_)中间的数据写入从begin()开始的位置
                     std::copy(begin()+readerIndex_,
                               begin()+writerIndex_,
                               begin()+kCheapPrepend);
                     readerIndex_ = kCheapPrepend;
+                    //reset writerIndex_
                     writerIndex_ = readerIndex_ + readable;
                     assert(readable == readableBytes());
                 }
             }
+
 
         private:
             std::vector<char> buffer_;

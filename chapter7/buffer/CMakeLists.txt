@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(buffer)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 add_subdirectory(base)
 set(SOURCE_CODE  Buffer.cpp  main.cpp SocketsOps.cpp Endian.h)
 add_executable(test_case ${SOURCE_CODE})

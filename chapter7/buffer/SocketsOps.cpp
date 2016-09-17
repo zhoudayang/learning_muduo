@@ -81,6 +81,7 @@ int sockets::createNonblockingOrDie(sa_family_t family)
 
   setNonBlockAndCloseOnExec(sockfd);
 #else
+    // 直接在建立连接的时候就指定是非阻塞
     int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
     if (sockfd < 0)
     {
@@ -90,6 +91,7 @@ int sockets::createNonblockingOrDie(sa_family_t family)
     return sockfd;
 }
 
+//将地址和socket进行绑定
 void sockets::bindOrDie(int sockfd, const struct sockaddr* addr)
 {
     int ret = ::bind(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
@@ -99,6 +101,7 @@ void sockets::bindOrDie(int sockfd, const struct sockaddr* addr)
     }
 }
 
+//开始监听端口，最大允许等待连接数目为128
 void sockets::listenOrDie(int sockfd)
 {
     int ret = ::listen(sockfd, SOMAXCONN);
@@ -113,11 +116,13 @@ int sockets::accept(int sockfd, struct sockaddr_in6* addr)
     socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
 #if VALGRIND || defined (NO_ACCEPT4)
     int connfd = ::accept(sockfd, sockaddr_cast(addr), &addrlen);
-  setNonBlockAndCloseOnExec(connfd);
+    setNonBlockAndCloseOnExec(connfd);
 #else
+    //接受连接，设置为非阻塞，并且在程序关闭时自动关闭连接
     int connfd = ::accept4(sockfd, sockaddr_cast(addr),
                            &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
 #endif
+    //输出错误信息
     if (connfd < 0)
     {
         int savedErrno = errno;
@@ -154,6 +159,7 @@ int sockets::accept(int sockfd, struct sockaddr_in6* addr)
 
 int sockets::connect(int sockfd, const struct sockaddr* addr)
 {
+    //向addr地址发起连接请求
     return ::connect(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
 }
 
@@ -162,16 +168,20 @@ ssize_t sockets::read(int sockfd, void *buf, size_t count)
     return ::read(sockfd, buf, count);
 }
 
+//从sockfd读取数据，写入iov中，
 ssize_t sockets::readv(int sockfd, const struct iovec *iov, int iovcnt)
 {
     return ::readv(sockfd, iov, iovcnt);
 }
 
+
+//向sockfd中写入buf对应的数据
 ssize_t sockets::write(int sockfd, const void *buf, size_t count)
 {
     return ::write(sockfd, buf, count);
 }
 
+//close file descriptor
 void sockets::close(int sockfd)
 {
     if (::close(sockfd) < 0)
@@ -180,6 +190,7 @@ void sockets::close(int sockfd)
     }
 }
 
+//关闭写入
 void sockets::shutdownWrite(int sockfd)
 {
     if (::shutdown(sockfd, SHUT_WR) < 0)
@@ -188,6 +199,7 @@ void sockets::shutdownWrite(int sockfd)
     }
 }
 
+//将addr转换为ip:port格式的字符串
 void sockets::toIpPort(char* buf, size_t size,
                        const struct sockaddr* addr)
 {
@@ -199,6 +211,7 @@ void sockets::toIpPort(char* buf, size_t size,
     snprintf(buf+end, size-end, ":%u", port);
 }
 
+//将addr 转换为　字符串格式的ip 字符串
 void sockets::toIp(char* buf, size_t size,
                    const struct sockaddr* addr)
 {
@@ -216,6 +229,7 @@ void sockets::toIp(char* buf, size_t size,
     }
 }
 
+//将ip port 转换为sockaddr_in
 void sockets::fromIpPort(const char* ip, uint16_t port,
                          struct sockaddr_in* addr)
 {
@@ -227,6 +241,7 @@ void sockets::fromIpPort(const char* ip, uint16_t port,
     }
 }
 
+//将ip　port 转换为sockaddr_in6
 void sockets::fromIpPort(const char* ip, uint16_t port,
                          struct sockaddr_in6* addr)
 {
@@ -238,6 +253,7 @@ void sockets::fromIpPort(const char* ip, uint16_t port,
     }
 }
 
+//获取socket上的errno
 int sockets::getSocketError(int sockfd)
 {
     int optval;
@@ -253,6 +269,7 @@ int sockets::getSocketError(int sockfd)
     }
 }
 
+//获取本地连接信息 sockaddr_in6格式
 struct sockaddr_in6 sockets::getLocalAddr(int sockfd)
 {
     struct sockaddr_in6 localaddr;
@@ -265,6 +282,7 @@ struct sockaddr_in6 sockets::getLocalAddr(int sockfd)
     return localaddr;
 }
 
+//获取对方连接信息 sockaddr_in6格式
 struct sockaddr_in6 sockets::getPeerAddr(int sockfd)
 {
     struct sockaddr_in6 peeraddr;
@@ -277,6 +295,7 @@ struct sockaddr_in6 sockets::getPeerAddr(int sockfd)
     return peeraddr;
 }
 
+//判断是否是同一连接
 #if !(__GNUC_PREREQ (4,6))
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
