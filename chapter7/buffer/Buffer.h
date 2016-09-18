@@ -59,7 +59,7 @@ namespace muduo
 
             void swap(Buffer& rhs)
             {
-                Buffer temp(std::move(rhs));
+                Buffer temp(rhs);
                 buffer_.swap(rhs.buffer_);
                 std::swap(readerIndex_, rhs.readerIndex_);
                 std::swap(writerIndex_, rhs.writerIndex_);
