@@ -128,7 +128,7 @@ void protobuf_AddDesc_query_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\013query.proto\022\005muduo\"9\n\005Query\022\n\n\002id\030\001 \002("
-    "\003\022\022\n\nquestioner\030\002 \002(\t\022\020\n\010question\030\003 \002(\t\""
+    "\003\022\022\n\nquestioner\030\002 \002(\t\022\020\n\010question\030\003 \003(\t\""
     "J\n\006Answer\022\n\n\002id\030\001 \002(\003\022\022\n\nquestioner\030\002 \002("
     "\t\022\016\n\006answer\030\003 \002(\t\022\020\n\010solution\030\004 \003(\t\"\023\n\005E"
     "mpty\022\n\n\002id\030\001 \001(\005B \n\021muduo.codec.testsB\013Q"
@@ -177,7 +177,6 @@ void Query::SharedCtor() {
   _cached_size_ = 0;
   id_ = GOOGLE_LONGLONG(0);
   questioner_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  question_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -188,9 +187,6 @@ Query::~Query() {
 void Query::SharedDtor() {
   if (questioner_ != &::google::protobuf::internal::kEmptyString) {
     delete questioner_;
-  }
-  if (question_ != &::google::protobuf::internal::kEmptyString) {
-    delete question_;
   }
   if (this != default_instance_) {
   }
@@ -225,12 +221,8 @@ void Query::Clear() {
         questioner_->clear();
       }
     }
-    if (has_question()) {
-      if (question_ != &::google::protobuf::internal::kEmptyString) {
-        question_->clear();
-      }
-    }
   }
+  question_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -273,19 +265,21 @@ bool Query::MergePartialFromCodedStream(
         break;
       }
 
-      // required string question = 3;
+      // repeated string question = 3;
       case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_question:
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_question()));
+                input, this->add_question()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-            this->question().data(), this->question().length(),
+            this->question(this->question_size() - 1).data(),
+            this->question(this->question_size() - 1).length(),
             ::google::protobuf::internal::WireFormat::PARSE);
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(26)) goto parse_question;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -322,13 +316,13 @@ void Query::SerializeWithCachedSizes(
       2, this->questioner(), output);
   }
 
-  // required string question = 3;
-  if (has_question()) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-      this->question().data(), this->question().length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE);
+  // repeated string question = 3;
+  for (int i = 0; i < this->question_size(); i++) {
+  ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+    this->question(i).data(), this->question(i).length(),
+    ::google::protobuf::internal::WireFormat::SERIALIZE);
     ::google::protobuf::internal::WireFormatLite::WriteString(
-      3, this->question(), output);
+      3, this->question(i), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -354,14 +348,13 @@ void Query::SerializeWithCachedSizes(
         2, this->questioner(), target);
   }
 
-  // required string question = 3;
-  if (has_question()) {
+  // repeated string question = 3;
+  for (int i = 0; i < this->question_size(); i++) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-      this->question().data(), this->question().length(),
+      this->question(i).data(), this->question(i).length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->question(), target);
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(3, this->question(i), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -389,14 +382,14 @@ int Query::ByteSize() const {
           this->questioner());
     }
 
-    // required string question = 3;
-    if (has_question()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::StringSize(
-          this->question());
-    }
-
   }
+  // repeated string question = 3;
+  total_size += 1 * this->question_size();
+  for (int i = 0; i < this->question_size(); i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->question(i));
+  }
+
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -422,15 +415,13 @@ void Query::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Query::MergeFrom(const Query& from) {
   GOOGLE_CHECK_NE(&from, this);
+  question_.MergeFrom(from.question_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_id()) {
       set_id(from.id());
     }
     if (from.has_questioner()) {
       set_questioner(from.questioner());
-    }
-    if (from.has_question()) {
-      set_question(from.question());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -449,7 +440,7 @@ void Query::CopyFrom(const Query& from) {
 }
 
 bool Query::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }
@@ -458,7 +449,7 @@ void Query::Swap(Query* other) {
   if (other != this) {
     std::swap(id_, other->id_);
     std::swap(questioner_, other->questioner_);
-    std::swap(question_, other->question_);
+    question_.Swap(&other->question_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

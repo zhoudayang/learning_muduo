@@ -112,17 +112,21 @@ class Query : public ::google::protobuf::Message {
   inline ::std::string* release_questioner();
   inline void set_allocated_questioner(::std::string* questioner);
 
-  // required string question = 3;
-  inline bool has_question() const;
+  // repeated string question = 3;
+  inline int question_size() const;
   inline void clear_question();
   static const int kQuestionFieldNumber = 3;
-  inline const ::std::string& question() const;
-  inline void set_question(const ::std::string& value);
-  inline void set_question(const char* value);
-  inline void set_question(const char* value, size_t size);
-  inline ::std::string* mutable_question();
-  inline ::std::string* release_question();
-  inline void set_allocated_question(::std::string* question);
+  inline const ::std::string& question(int index) const;
+  inline ::std::string* mutable_question(int index);
+  inline void set_question(int index, const ::std::string& value);
+  inline void set_question(int index, const char* value);
+  inline void set_question(int index, const char* value, size_t size);
+  inline ::std::string* add_question();
+  inline void add_question(const ::std::string& value);
+  inline void add_question(const char* value);
+  inline void add_question(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& question() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_question();
 
   // @@protoc_insertion_point(class_scope:muduo.Query)
  private:
@@ -130,14 +134,12 @@ class Query : public ::google::protobuf::Message {
   inline void clear_has_id();
   inline void set_has_questioner();
   inline void clear_has_questioner();
-  inline void set_has_question();
-  inline void clear_has_question();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int64 id_;
   ::std::string* questioner_;
-  ::std::string* question_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> question_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
@@ -459,74 +461,48 @@ inline void Query::set_allocated_questioner(::std::string* questioner) {
   }
 }
 
-// required string question = 3;
-inline bool Query::has_question() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void Query::set_has_question() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void Query::clear_has_question() {
-  _has_bits_[0] &= ~0x00000004u;
+// repeated string question = 3;
+inline int Query::question_size() const {
+  return question_.size();
 }
 inline void Query::clear_question() {
-  if (question_ != &::google::protobuf::internal::kEmptyString) {
-    question_->clear();
-  }
-  clear_has_question();
+  question_.Clear();
 }
-inline const ::std::string& Query::question() const {
-  return *question_;
+inline const ::std::string& Query::question(int index) const {
+  return question_.Get(index);
 }
-inline void Query::set_question(const ::std::string& value) {
-  set_has_question();
-  if (question_ == &::google::protobuf::internal::kEmptyString) {
-    question_ = new ::std::string;
-  }
-  question_->assign(value);
+inline ::std::string* Query::mutable_question(int index) {
+  return question_.Mutable(index);
 }
-inline void Query::set_question(const char* value) {
-  set_has_question();
-  if (question_ == &::google::protobuf::internal::kEmptyString) {
-    question_ = new ::std::string;
-  }
-  question_->assign(value);
+inline void Query::set_question(int index, const ::std::string& value) {
+  question_.Mutable(index)->assign(value);
 }
-inline void Query::set_question(const char* value, size_t size) {
-  set_has_question();
-  if (question_ == &::google::protobuf::internal::kEmptyString) {
-    question_ = new ::std::string;
-  }
-  question_->assign(reinterpret_cast<const char*>(value), size);
+inline void Query::set_question(int index, const char* value) {
+  question_.Mutable(index)->assign(value);
 }
-inline ::std::string* Query::mutable_question() {
-  set_has_question();
-  if (question_ == &::google::protobuf::internal::kEmptyString) {
-    question_ = new ::std::string;
-  }
+inline void Query::set_question(int index, const char* value, size_t size) {
+  question_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Query::add_question() {
+  return question_.Add();
+}
+inline void Query::add_question(const ::std::string& value) {
+  question_.Add()->assign(value);
+}
+inline void Query::add_question(const char* value) {
+  question_.Add()->assign(value);
+}
+inline void Query::add_question(const char* value, size_t size) {
+  question_.Add()->assign(reinterpret_cast<const char*>(value), size);
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+Query::question() const {
   return question_;
 }
-inline ::std::string* Query::release_question() {
-  clear_has_question();
-  if (question_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = question_;
-    question_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void Query::set_allocated_question(::std::string* question) {
-  if (question_ != &::google::protobuf::internal::kEmptyString) {
-    delete question_;
-  }
-  if (question) {
-    set_has_question();
-    question_ = question;
-  } else {
-    clear_has_question();
-    question_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+Query::mutable_question() {
+  return &question_;
 }
 
 // -------------------------------------------------------------------
