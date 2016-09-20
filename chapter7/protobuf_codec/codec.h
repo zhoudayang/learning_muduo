@@ -42,14 +42,19 @@ public:
     }
     void onMessage(const muduo::net::TcpConnectionPtr &conn,muduo::net::Buffer *buf,muduo::Timestamp receiveTime);
 
+    //convert message to buf data and send buf
     void send(const muduo::net::TcpConnectionPtr & conn,const google::protobuf::Message & message){
         muduo::net::Buffer buf;
         fillEmptyBuffer(&buf,message);
         conn->send(&buf);
     }
+    //convert error code to error string
     static const muduo::string & errorCodeToString(ErrorCode errorCode);
+    //fill message into empty buf
     static void fillEmptyBuffer(muduo::net::Buffer * buf,const google::protobuf::Message & message);
+    //get message instance from type_name
     static google::protobuf::Message * createMessage(const std::string & type_name);
+    //parse buf into message instance
     static MessagePtr parse(const char * buf,int len,ErrorCode * errorCode);
 
 private:
