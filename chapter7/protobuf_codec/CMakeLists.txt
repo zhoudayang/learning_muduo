@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.5)
+project(protobuf_codec)
+include_directories(/home/zhouyang/Documents/muduo/include)
+link_libraries(/home/zhouyang/Documents/muduo/lib)
+find_package(Protobuf REQUIRED)
+find_package(Threads REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIR})
+set(server_src codec.cpp)
+add_executable(codec_test codec_test.cpp codec.h)
+
