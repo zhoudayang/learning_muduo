@@ -11,11 +11,14 @@
 #include <boost/noncopyable.hpp>
 
 namespace pubsub {
+
     using muduo::string;
+
+    //enum to show status
     enum ParseResult {
-        kError,
-        kSucess,
-        kContinue,
+        kError, //error
+        kSuccess, //success
+        kContinue,//continue
     };
 
     ParseResult parseMessage(muduo::net::Buffer *buf,
