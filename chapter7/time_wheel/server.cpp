@@ -1,37 +1,41 @@
+//
+// Created by zhouyang on 16-9-21.
+//
 #include "echo.h"
+
 #include <muduo/base/Logging.h>
 #include <muduo/net/EventLoop.h>
-#include <boost/functional/hash/hash.hpp>
-#include <muduo/net/InetAddress.h>
-
 
 using namespace muduo;
 using namespace muduo::net;
 
-//两个shared_ptr 如果指向不同的对象，那么他们的hash值不相同
-//如果指向相同的对象，他们的值相同
-//如果都不指向任何对象，他们的值也相同
-void testHash() {
+//test hash function run right for shared_ptr
+void testHash(){
     boost::hash<boost::shared_ptr<int> > h;
     boost::shared_ptr<int> x1(new int(10));
     boost::shared_ptr<int> x2(new int(10));
     h(x1);
     assert(h(x1) != h(x2));
-    x1 = x2;
+    x1 =x2;
     assert(h(x1) == h(x2));
     x1.reset();
     assert(h(x1) != h(x2));
     x2.reset();
     assert(h(x1) == h(x2));
-}
 
-int main() {
-    testHash();
+}
+int main(int argc,char **argv){
     EventLoop loop;
-    InetAddress listenAddress(2008);
+    InetAddress listenAddr(2007);
     int idleSeconds = 10;
-    LOG_INFO << "pid = " << getpid() << ", idle seconds = " << idleSeconds;
-    EchoServer server(&loop, listenAddress, idleSeconds);
+
+    if(argc >1){
+        idleSeconds = atoi(argv[1]);
+    }
+    LOG_INFO<<"pid = "<<getpid() <<" , idle seconds = "<<idleSeconds;
+    EchoServer server( &loop,listenAddr,idleSeconds);
     server.start();
     loop.loop();
+
+    return 0;
 }
