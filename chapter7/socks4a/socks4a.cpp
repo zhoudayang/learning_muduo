@@ -121,7 +121,7 @@ void onServerMessage(const TcpConnectionPtr &conn,Buffer * buf,Timestamp){
         //get TcpConnectionPtr
         const TcpConnectionPtr &clientConn = boost::any_cast<const TcpConnectionPtr &>(conn->getContext());
         //send buf to client
-        //this buffer is input buffer, write it to output buffer to send to client 
+        //this buffer is input buffer, write it to output buffer to send to client
         clientConn->send(buf);
     }
 }

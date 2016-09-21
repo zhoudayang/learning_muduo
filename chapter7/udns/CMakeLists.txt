@@ -1,0 +1,10 @@
+project(udns)
+cmake_minimum_required(VERSION 3.5)
+find_package(Threads)
+include_directories(/home/zhouyang/Documents/muduo/include)
+link_directories(/home/zhouyang/Documents/muduo/lib)
+include_directories(udns)
+link_directories(lib)
+add_executable(dns dns.cpp Resolve.cpp)
+target_link_libraries(dns udns muduo_base muduo_net ${CMAKE_THREAD_LIBS_INIT})
+
