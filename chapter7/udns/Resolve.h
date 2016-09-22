@@ -22,6 +22,7 @@ namespace muduo{
         class EventLoop;
         class Resolver:boost::noncopyable{
         public:
+            //call back function called when get InetAddress
             typedef boost::function<void(const InetAddress &)> Callback;
 
             Resolver(EventLoop * loop);
@@ -61,7 +62,4 @@ namespace muduo{
         };
     }
 }
-
-
-
 #endif //UDNS_RESOLVE_H

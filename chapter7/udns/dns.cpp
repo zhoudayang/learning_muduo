@@ -19,11 +19,14 @@ void quit(){
     g_loop->quit();
 }
 
+//resolveCallback function
 void resolveCallback(const string & host,const InetAddress &addr){
     LOG_INFO<<"resolved "<< host<< " -> "<<addr.toIp();
+    //if get all record, quit the loop
     if(++count == total)
         quit();
 }
+
 
 void resolve(Resolver * res,const string &host){
     res->resolve(host,boost::bind(&resolveCallback,host,_1));
@@ -33,7 +36,8 @@ int main(int argc, char ** argv){
     EventLoop loop;
     loop.runAfter(10,quit);
     g_loop = & loop;
-    Resolver resolver (&loop);
+    InetAddress nameServer("114.114.114.114",53);
+    Resolver resolver (&loop,nameServer);
     resolver.start();
     if(argc ==1){
         total ==3;

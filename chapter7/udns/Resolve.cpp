@@ -13,6 +13,7 @@
 #include <udns.h>
 
 namespace {
+    //init function
     int init_udns(){
         static bool initialized = false;
         if(!initialized)
@@ -20,6 +21,8 @@ namespace {
         initialized = true;
         return 1;
     }
+
+    //an helper class to init udns when init and reset udns where destruct
     struct UdnsInitializer{
         UdnsInitializer(){
             init_udns();
@@ -30,10 +33,11 @@ namespace {
     };
 
     UdnsInitializer udnsInitializer;
+
+    //if it is true, enable to debug
     const bool kDebug = false;
 }
 using namespace muduo::net;
-
 
 Resolver::Resolver(EventLoop *loop) :
     loop_(loop),
@@ -44,17 +48,29 @@ Resolver::Resolver(EventLoop *loop) :
     init_udns();
     ctx_ = ::dns_new(NULL);
     assert(ctx_ !=NULL);
+    //set timeout to 2 seconds
     ::dns_set_opt(ctx_,DNS_OPT_TIMEOUT,2);
 
 }
 
-Resolver::Resolver(EventLoop *loop, const InetAddress &nameServer) {
-
+//resolve by given nameServer
+Resolver::Resolver(EventLoop *loop, const InetAddress &nameServer):
+    loop_(loop),
+    ctx_(NULL),
+    fd_(-1),
+    timerActive_(false)
+{
+    init_udns();
+    ctx_ = ::dns_new(NULL);
+    assert(ctx_ !=NULL);
+    ::dns_add_serv_s(ctx_,nameServer.getSockAddr());
+    ::dns_set_opt(ctx_,DNS_OPT_TIMEOUT,2);
 }
 
 Resolver::~Resolver() {
     channel_ ->disableAll();
     channel_->remove();
+    /* free resolver context returned by dns_new(); all queries are dropped */
     ::dns_free(ctx_);
 }
 
