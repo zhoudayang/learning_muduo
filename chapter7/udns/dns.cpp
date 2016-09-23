@@ -38,11 +38,12 @@ int main(int argc, char ** argv){
     g_loop = & loop;
     InetAddress nameServer("114.114.114.114",53);
     Resolver resolver (&loop,nameServer);
+    //start resolver
     resolver.start();
     if(argc ==1){
         total ==3;
         resolve(&resolver ,"zhouyang.online");
-        resolve(&resolver,"www.baidu.com");
+        resolve(&resolver,"www.adsadwewqefds.com");
         resolve(&resolver,"www.csdn.net");
     }
     else{
