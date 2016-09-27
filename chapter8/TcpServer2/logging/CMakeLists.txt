@@ -1,6 +1,0 @@
-cmake_minimum_required(VERSION 3.5)
-project(logging)
-include_directories(${CMAKE_SOURCE_DIR})
-set(src LogStream.cpp logging.cpp)
-add_library(log SHARED ${src})
-target_link_libraries(log thread time)
