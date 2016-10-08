@@ -20,7 +20,7 @@ class myClient(threading.Thread):
         message = sock.recv(4096)
         print "receive data:",message
         message = sock.recv(4096)
-        if message == -1:
+        if not  message:
             print "connection closed!"
 
 if __name__ == "__main__":
