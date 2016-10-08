@@ -28,6 +28,7 @@ namespace muduo{
     class Channel;
     class Poller:boost::noncopyable{
     public:
+        //type of container that store Channel *
         typedef std::vector<Channel *> ChannelList;
 
         Poller(EventLoop * loop);
@@ -51,7 +52,7 @@ namespace muduo{
 
         //vector that store struct  pollfd
         typedef std::vector<struct pollfd> PollFdList;
-        //key index in ChannelList, value Channel pointer
+        //key file descriptor, value Channel pointer
         typedef std::map<int,Channel *> ChannelMap;
 
         EventLoop * ownerLoop_;

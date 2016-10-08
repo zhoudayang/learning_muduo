@@ -170,6 +170,7 @@ bool TimerQueue::insert(Timer *timer) {
     }
     std::pair<TimerList::iterator, bool> result =
             timers_.insert(std::make_pair(when, timer));
+    //assert insert successful
     assert(result.second);
     return earliestChanged;
 }
@@ -184,6 +185,7 @@ TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double int
 void TimerQueue::addTimerInLoop(Timer *timer) {
     loop_->assertInLoopThread();
     bool earliestChanged = insert(timer);
+    //如果最先触发的时刻有变，重新设置Timer fd
     if(earliestChanged){
         resetTimerfd(timerfd_,timer->expiration());
     }

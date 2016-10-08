@@ -52,6 +52,7 @@ void Poller::fillActiveChannels(int numEvents, ChannelList *activeChannels) cons
             assert(channel->fd() == pfd->fd);
             //set flag to show that events happened
             channel->set_revents(pfd->revents);
+            //store active channels
             activeChannels->push_back(channel);
         }
     }

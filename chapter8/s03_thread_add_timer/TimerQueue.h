@@ -67,7 +67,7 @@ namespace muduo {
         // Timer list sorted by expiration
         TimerList timers_;
 
-        void addTimerInLoop(Timer * timer);
+        void addTimerInLoop(Timer *timer);
 
     };
 
