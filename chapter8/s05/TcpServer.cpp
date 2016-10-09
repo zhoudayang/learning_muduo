@@ -45,6 +45,7 @@ void TcpServer::start(){
 void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
     loop_->assertInLoopThread();
     char buf [32];
+    //nextConnId is an integer begin with 1 and increase by 1
     snprintf(buf,sizeof buf, "#%d",nextConnId_);
     ++nextConnId_;
     std::string connName = name_ + buf;

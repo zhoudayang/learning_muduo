@@ -16,8 +16,10 @@
 namespace muduo {
     namespace detail {
         int createTimerfd() {
+            /* Monotonic system-wide clock.  */
             int timerfd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
-            if (timerfd < 0) {
+            if (timerfd < 0)
+            {
                 LOG_SYSFATAL << "Failer in timerfd_create";
             }
             return timerfd;
@@ -26,7 +28,8 @@ namespace muduo {
         //get how much time from now, return as struct timespec
         struct timespec howMuchTimeFromNow(Timestamp when) {
             int64_t microseconds = when.microSecondsSinceEpoch() - Timestamp::now().microSecondsSinceEpoch();
-            if (microseconds < 100) {
+            if (microseconds < 100)
+            {
                 microseconds = 100;
             }
             struct timespec ts;
@@ -41,7 +44,8 @@ namespace muduo {
             uint64_t howmany;
             ssize_t n = ::read(timerfd, &howmany, sizeof howmany);
             LOG_TRACE << "TimerQueue::handleRead() " << howmany << " at " << now.toString();
-            if (n != sizeof howmany) {
+            if (n != sizeof howmany)
+            {
                 LOG_ERROR << "TimerQueue::handleRead() reads " << n << "bytes instead of 8 ";
             }
         }
@@ -69,7 +73,8 @@ namespace muduo {
 
                 flags：1代表设置的是绝对时间；为0代表相对时间。
              */
-            if (ret) {
+            if (ret)
+            {
                 LOG_SYSERR << "timerfd_settime()";
             }
         }
@@ -79,13 +84,14 @@ namespace muduo {
 using namespace muduo;
 using namespace muduo::detail;
 
+//小结：当触发定时器时会拿出当前超时的所有Entry,调用其run函数(即run callback function)。调用完毕会将需要重复执行的Entry reset之后加入TimerList,并且设置定时器下一次触发时间。
+//增加新的定时任务时，看这次添加是否会改变第一次超时的Entry，若改变，则重新设置定时器超时时间。
 TimerQueue::TimerQueue(EventLoop *loop)
         : loop_(loop),
           timerfd_(createTimerfd()),
-          //init a new timer channel
+        //init a new timer channel
           timerfdChannel_(loop, timerfd_),
-          timers_()
-{
+          timers_() {
     //set read callback function
     timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead, this));
     // we are always reading the timerfd, we disarm it with timerfd_settime.
@@ -97,7 +103,8 @@ TimerQueue::~TimerQueue() {
     ::close(timerfd_);
     // do not remove channel, since we're in EventLoop::dtor();
     for (TimerList::iterator it = timers_.begin();
-         it != timers_.end(); ++it) {
+         it != timers_.end(); ++it)
+    {
         delete it->second;
     }
 }
@@ -114,7 +121,8 @@ void TimerQueue::handleRead() {
 
     // safe to callback outside critical section
     for (std::vector<Entry>::iterator it = expired.begin();
-         it != expired.end(); ++it) {
+         it != expired.end(); ++it)
+    {
         //run callback function
         it->second->run();
     }
@@ -141,22 +149,28 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
     Timestamp nextExpire;
 
     for (std::vector<Entry>::const_iterator it = expired.begin();
-         it != expired.end(); ++it) {
-        if (it->second->repeat()) {
+         it != expired.end(); ++it)
+    {
+        if (it->second->repeat())
+        {
             it->second->restart(now);
             //处理重复定时器
             insert(it->second);
         }
-        else {
+        else
+        {
             delete it->second;
         }
     }
 
-    if (!timers_.empty()) {
+    if (!timers_.empty())
+    {
         nextExpire = timers_.begin()->second->expiration();
     }
 
-    if (nextExpire.valid()) {
+    //if nextExpire time is valid, reset timer next alarm time
+    if (nextExpire.valid())
+    {
         resetTimerfd(timerfd_, nextExpire);
     }
 }
@@ -165,7 +179,8 @@ bool TimerQueue::insert(Timer *timer) {
     bool earliestChanged = false;
     Timestamp when = timer->expiration();
     TimerList::iterator it = timers_.begin();
-    if (it == timers_.end() || when < it->first) {
+    if (it == timers_.end() || when < it->first)
+    {
         earliestChanged = true;
     }
     std::pair<TimerList::iterator, bool> result =
@@ -178,7 +193,7 @@ bool TimerQueue::insert(Timer *timer) {
 TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double interval) {
     Timer *timer = new Timer(cb, when, interval);
     //call addTimerInLoop function to add timer, to ensure add timer in io thread
-    loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop,this,timer));
+    loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop, this, timer));
     return TimerId(timer);
 }
 
@@ -186,8 +201,9 @@ void TimerQueue::addTimerInLoop(Timer *timer) {
     loop_->assertInLoopThread();
     bool earliestChanged = insert(timer);
     //如果最先触发的时刻有变，重新设置Timer fd
-    if(earliestChanged){
-        resetTimerfd(timerfd_,timer->expiration());
+    if (earliestChanged)
+    {
+        resetTimerfd(timerfd_, timer->expiration());
     }
 }
 

@@ -12,6 +12,9 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
+//小结
+//Acceptor accept　new connection, and build new socket file descriptor, use this file descriptor create TcpConnection instance, and call connectEstablished function.
+//if the above socket handle read event, it will call handleRead in which will call message callback function
 namespace muduo {
     class Acceptor;
 

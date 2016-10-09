@@ -49,6 +49,7 @@ namespace muduo {
     private:
 
         typedef std::pair<Timestamp, Timer *> Entry;
+        //按照触发时间的先后顺序存储Entry
         typedef std::set<Entry> TimerList;
 
         // called when timerfd alarms

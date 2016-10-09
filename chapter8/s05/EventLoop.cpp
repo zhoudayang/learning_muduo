@@ -107,6 +107,8 @@ void EventLoop::abortNotInLoopThread() {
     << " was created in threadId_ = " << threadId_
     << ", current thread id = " << CurrentThread::tid();
 }
+
+//可能在doPendingFunctors中调用
 void EventLoop::runInLoop(const Functor &cb){
     if(isInLoopThread()){
         //if is in io thread, call the callback function
@@ -117,6 +119,8 @@ void EventLoop::runInLoop(const Functor &cb){
         queueInLoop(cb);
     }
 }
+
+//可能在doPendingFunctors中调用
 void EventLoop::queueInLoop(const Functor &cb) {
     {
         MutexLockGuard lock(mutex_);
@@ -149,6 +153,7 @@ void EventLoop::doPendingFunctors() {
     std::vector<Functor> functors;
     //标明现在运行 pending functors
     callingPendingFunctors_ = true;
+    //swap减小临界区
     {
         MutexLockGuard lock(mutex_);
         functors.swap(pendingFunctors_);
