@@ -38,6 +38,7 @@ void Acceptor::handleRead()
     loop_->assertInLoopThread();
     InetAddress peerAddr(0);
     //get peer network address
+    //在accept的时候获取peerAddress
     int connfd = acceptSocket_.accpet(&peerAddr);
     //here connfd is the file descriptor of connection between server and peer client
     if (connfd>=0)
