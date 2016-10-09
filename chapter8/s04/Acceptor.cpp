@@ -32,6 +32,7 @@ void Acceptor::listen()
     acceptChannel_.enableReading();
 }
 
+//read callback function when polled by poller
 void Acceptor::handleRead()
 {
     loop_->assertInLoopThread();

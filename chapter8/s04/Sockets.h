@@ -14,7 +14,10 @@ namespace muduo {
     public:
         explicit Socket(int sockfd)
                 :sockfd_(sockfd) { }
+
+        //destructor, close the connection
         ~Socket();
+
         int fd() const
         {
             return sockfd_;

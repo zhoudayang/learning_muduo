@@ -42,18 +42,25 @@ namespace muduo
           return ntohs (net16);
         }
 
+        //create nonblocking socket
         int createNoblockingOrDie ();
 
+        //bind socket to sockaddr_in
         void bindOrDie (int sockfd, const struct sockaddr_in &addr);
 
+        //begin to listen
         void listenOrDie (int sockfd);
 
+        //accept connection and return file descriptor
         int accept (int sockfd, struct sockaddr_in *addr);
 
+        //close the connection of given socket file descriptor
         void close (int sockfd);
 
+        //transform from sockaddr_in to string ip:port
         void toHostPort (char *buf, size_t size, const struct sockaddr_in &addr);
 
+        //get sockaddr_in from ip string and port
         void fromHostPort (const char *ip, uint16_t port, struct sockaddr_in *addr);
     }
 }
