@@ -93,6 +93,7 @@ void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& con)
     size_t n = connections_.erase(con->name());
     assert(n==1);
     EventLoop* ioLoop = con->getLoop();
+    //get ioLoop from TcpConnection instance, and run connectDestroyed in loop
     ioLoop->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, con));
 }
 
