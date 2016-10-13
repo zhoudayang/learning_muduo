@@ -62,6 +62,7 @@ void TcpConnection::handleRead(Timestamp receiveTime)
     }
     else if (n==0)
     {
+        //read 0, call handle close function
         handleClose();
     }
     else

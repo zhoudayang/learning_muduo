@@ -29,7 +29,10 @@ TcpConnection::TcpConnection(EventLoop *loop, const std::string &name, int sockf
     LOG_DEBUG << "TcpConnection::ctor[" << name_ << "] at"
               << this << " fd=" << sockfd;
     //set read callback function for channel of this TcpConnection
-    channel_->setReadCallback(boost::bind(&TcpConnection::handleRead, this,_1));
+    channel_->setReadCallback(boost::bind(&TcpConnection::handleRead, this, _1));
+    channel_->setWriteCallback(boost::bind(&TcpConnection::handleWrite,this));
+    channel_->setCloseCallback(boost::bind(&TcpConnection::handleClose,this));
+    channel_->setErrorCallback(boost::bind(&TcpConnection::handleError,this));
 }
 
 TcpConnection::~TcpConnection() {

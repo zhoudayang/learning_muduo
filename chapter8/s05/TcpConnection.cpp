@@ -28,7 +28,9 @@ TcpConnection::TcpConnection(EventLoop *loop, const std::string &name, int sockf
     LOG_DEBUG << "TcpConnection::ctor[" << name_ << "] at"
               << this << " fd=" << sockfd;
     //set read callback function for channel of this TcpConnection
-    channel_->setReadCallback(boost::bind(&TcpConnection::handleRead, this));
+     channel_->setReadCallback(
+      boost::bind(&TcpConnection::handleRead, this));
+
 }
 
 TcpConnection::~TcpConnection() {
