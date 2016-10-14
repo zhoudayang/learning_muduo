@@ -45,6 +45,7 @@ namespace muduo {
 
         TimerId runEvery(double interval, const TimerCallback &cb);
 
+        //function add to cancel timer that run every second
         void cancel(TimerId timerId);
 
         //update Channel in Poller

@@ -121,8 +121,9 @@ void TimerQueue::handleRead() {
     readTimerfd(timerfd_, now);
     //get timeout Entry
     std::vector<Entry> expired = getExpired(now);
-    //标注是否正在运行期望运行的Timer, 避免在这些时刻将Timer 析构了，造成严重错误
+    // 如果当前正在运行getExpired对应的timer，下面要开始reset,为了避免cancel的loop被重新加入，要看这个Timer是否在cancelingTimers_中
     callingExpiredTimers_ = true;
+    //首先将上一次记录的需要cancel的容易cancelingTimers_清空
     cancelingTimers_.clear();
     // safe to callback outside critical section
     for (std::vector<Entry>::iterator it = expired.begin();
@@ -151,12 +152,12 @@ std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now) {
     //将这些处理过的元素删除　
     timers_.erase(timers_.begin(), it);
     //boost foreach do same thing for each element in container
+    //从activeTimers_中删除对应的timer
     BOOST_FOREACH(Entry entry,expired){
         ActiveTimer timer (entry.second,entry.second->sequence());
         size_t n = activeTimers_.erase(timer);
         assert(n==1);
     }
-
     assert(timers_.size() == activeTimers_.size());
     return expired;
 }
@@ -168,6 +169,7 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
          it != expired.end(); ++it)
     {
         ///add below these 2 line code to support cancel
+        ///如果当前正在运行getExpired对应的timer，下面要开始reset,为了避免cancel的loop被重新加入，要看这个Timer是否在cancelingTimers_中
         ActiveTimer timer(it->second,it->second->sequence());
         if (it->second->repeat() && cancelingTimers_.find(timer) == cancelingTimers_.end())
         {
@@ -185,7 +187,7 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
     {
         nextExpire = timers_.begin()->second->expiration();
     }
-
+    //原始的nextExpire如果不经过上述if分支，is not valid
     //if nextExpire time is valid, reset timer next alarm time
     if (nextExpire.valid())
     {
@@ -251,9 +253,10 @@ void TimerQueue::cancelInLoop(TimerId timerId) {
     if(it!=activeTimers_.end()){
         size_t n = timers_.erase(Entry(it->first->expiration(),it->first));
         assert(n==1);
-        delete it->first;
+        delete it->first;//fixme::no delete please
         activeTimers_.erase(it);
     }
+        // 如果当前正在运行getExpired对应的timer，下面要开始reset,为了避免cancel的loop被重新加入，要看这个Timer是否在cancelingTimers_中
     else if(callingExpiredTimers_){
         cancelingTimers_.insert(timer);
     }

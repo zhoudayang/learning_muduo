@@ -78,6 +78,7 @@ namespace muduo {
         ActiveTimerSet activeTimers_;
         //这两个变量用于应付自注销这种情况，即在定时器中回调注销当前定时器的情况
         bool callingExpiredTimers_;
+        //记录自行删除Timer的那些Timer
         ActiveTimerSet cancelingTimers_;
 
     };
