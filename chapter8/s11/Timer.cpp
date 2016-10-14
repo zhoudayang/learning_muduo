@@ -6,6 +6,9 @@
 
 using namespace muduo;
 
+//init static 成员
+AtomicInt64 Timer::s_numCreated_;
+
 void Timer::restart(Timestamp now) {
     if (repeat_) {
         //如果重复，设置下一个触发定时器的时刻

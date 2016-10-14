@@ -3,6 +3,7 @@ project(s11)
 find_package(Threads)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(SOURCE_FILES
+        Atomic.h
         Types.h
         Mutex.h
         Condition.cpp
@@ -23,7 +24,6 @@ set(SOURCE_FILES
         AsyncLogging.cpp
         FileUtil.cpp
         Exception.cpp
-        Atomic.h
         ThreadPool.cpp
         )
 add_library(base ${SOURCE_FILES})

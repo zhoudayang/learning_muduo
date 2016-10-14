@@ -1,5 +1,5 @@
 //
-// Created by fit on 16-8-19.
+// Created by zhouyang on 16-8-19.
 //
 
 #ifndef ATOMIC_H

@@ -20,7 +20,6 @@ set(LIBRARY_SOURCE
         TcpServer.cpp
         Buffer.cpp
         EventLoopThreadPool.cpp
-        Connector.cpp
         )
 add_library(event ${LIBRARY_SOURCE})
 target_link_libraries(event base ${CMAKE_THREAD_LIBS_INIT})
@@ -40,3 +39,6 @@ target_link_libraries(error event)
 
 add_executable(test11 test11.cpp)
 target_link_libraries(test11 event)
+
+add_executable(test_self_cancel test_self_cancel.cpp)
+target_link_libraries(test_self_cancel event)

@@ -25,7 +25,6 @@ namespace muduo {
 
     class TimerId;
 
-//
 /// A best efforts timer queue.
 /// No guarantee that the callback will be on time.
 ///
@@ -44,7 +43,7 @@ namespace muduo {
                          Timestamp when,
                          double interval);
 
-        // void cancel(TimerId timerId);
+        void cancel(TimerId timerId);
 
     private:
 
@@ -69,6 +68,17 @@ namespace muduo {
         TimerList timers_;
 
         void addTimerInLoop(Timer *timer);
+
+        void cancelInLoop(TimerId timerId);
+
+        typedef std::pair<Timer* ,int64_t> ActiveTimer;
+        typedef std::set<ActiveTimer> ActiveTimerSet;
+
+
+        ActiveTimerSet activeTimers_;
+        //这两个变量用于应付自注销这种情况，即在定时器中回调注销当前定时器的情况
+        bool callingExpiredTimers_;
+        ActiveTimerSet cancelingTimers_;
 
     };
 

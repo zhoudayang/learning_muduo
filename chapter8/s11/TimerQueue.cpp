@@ -10,6 +10,7 @@
 #include "TimerId.h"
 
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 
 #include <sys/timerfd.h>
 
@@ -91,7 +92,9 @@ TimerQueue::TimerQueue(EventLoop *loop)
           timerfd_(createTimerfd()),
         //init a new timer channel
           timerfdChannel_(loop, timerfd_),
-          timers_() {
+          timers_(),
+          callingExpiredTimers_(false)
+{
     //set read callback function
     timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead, this));
     // we are always reading the timerfd, we disarm it with timerfd_settime.
@@ -118,7 +121,9 @@ void TimerQueue::handleRead() {
     readTimerfd(timerfd_, now);
     //get timeout Entry
     std::vector<Entry> expired = getExpired(now);
-
+    //标注是否正在运行期望运行的Timer, 避免在这些时刻将Timer 析构了，造成严重错误
+    callingExpiredTimers_ = true;
+    cancelingTimers_.clear();
     // safe to callback outside critical section
     for (std::vector<Entry>::iterator it = expired.begin();
          it != expired.end(); ++it)
@@ -126,11 +131,14 @@ void TimerQueue::handleRead() {
         //run callback function
         it->second->run();
     }
+    callingExpiredTimers_ = false;
     //处理那些需要重复执行的timer,将他们重新加入TimerList
     reset(expired, now);
 }
 
 std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now) {
+    assert(timers_.size() == activeTimers_.size());
+
     std::vector<Entry> expired;
     //用当前时间和最大的地址值来作为查找的分隔点
     Entry sentry = std::make_pair(now, reinterpret_cast<Timer *>(UINTPTR_MAX));
@@ -142,6 +150,14 @@ std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now) {
     std::copy(timers_.begin(), it, back_inserter(expired));
     //将这些处理过的元素删除　
     timers_.erase(timers_.begin(), it);
+    //boost foreach do same thing for each element in container
+    BOOST_FOREACH(Entry entry,expired){
+        ActiveTimer timer (entry.second,entry.second->sequence());
+        size_t n = activeTimers_.erase(timer);
+        assert(n==1);
+    }
+
+    assert(timers_.size() == activeTimers_.size());
     return expired;
 }
 
@@ -151,7 +167,9 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
     for (std::vector<Entry>::const_iterator it = expired.begin();
          it != expired.end(); ++it)
     {
-        if (it->second->repeat())
+        ///add below these 2 line code to support cancel
+        ActiveTimer timer(it->second,it->second->sequence());
+        if (it->second->repeat() && cancelingTimers_.find(timer) == cancelingTimers_.end())
         {
             it->second->restart(now);
             //处理重复定时器
@@ -176,6 +194,8 @@ void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now) {
 }
 
 bool TimerQueue::insert(Timer *timer) {
+    loop_->assertInLoopThread();
+    assert(timers_.size() == activeTimers_.size());
     bool earliestChanged = false;
     Timestamp when = timer->expiration();
     TimerList::iterator it = timers_.begin();
@@ -183,10 +203,18 @@ bool TimerQueue::insert(Timer *timer) {
     {
         earliestChanged = true;
     }
-    std::pair<TimerList::iterator, bool> result =
-            timers_.insert(std::make_pair(when, timer));
-    //assert insert successful
-    assert(result.second);
+    // 将新的timer同时插入timers_ 和 activeTimers_
+    {
+        std::pair<TimerList::iterator, bool> result =
+                timers_.insert(std::make_pair(when, timer));
+        //assert insert successful
+        assert(result.second);
+    }
+    {
+        std::pair<ActiveTimerSet::iterator,bool> result = activeTimers_.insert(ActiveTimer(timer,timer->sequence()));
+        assert(result.second);
+    }
+    assert(timers_.size() == activeTimers_.size());
     return earliestChanged;
 }
 
@@ -194,7 +222,7 @@ TimerId TimerQueue::addTimer(const TimerCallback &cb, Timestamp when, double int
     Timer *timer = new Timer(cb, when, interval);
     //call addTimerInLoop function to add timer, to ensure add timer in io thread
     loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop, this, timer));
-    return TimerId(timer);
+    return TimerId(timer,timer->sequence());
 }
 
 void TimerQueue::addTimerInLoop(Timer *timer) {
@@ -207,5 +235,29 @@ void TimerQueue::addTimerInLoop(Timer *timer) {
     }
 }
 
+
+//add function to support timer
+
+void TimerQueue::cancel(TimerId timerId) {
+    loop_->runInLoop(boost::bind(&TimerQueue::cancelInLoop,this,timerId));
+}
+
+
+void TimerQueue::cancelInLoop(TimerId timerId) {
+    loop_->assertInLoopThread();
+    assert(timers_.size() == activeTimers_.size());
+    ActiveTimer timer(timerId.timer_,timerId.sequence_);
+    ActiveTimerSet::iterator it = activeTimers_.find(timer);
+    if(it!=activeTimers_.end()){
+        size_t n = timers_.erase(Entry(it->first->expiration(),it->first));
+        assert(n==1);
+        delete it->first;
+        activeTimers_.erase(it);
+    }
+    else if(callingExpiredTimers_){
+        cancelingTimers_.insert(timer);
+    }
+    assert(timers_.size() == activeTimers_.size());
+}
 
 

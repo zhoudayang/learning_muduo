@@ -9,6 +9,7 @@
 
 #include "base/Timestamp.h"
 #include "Callback.h"
+#include "base/Atomic.h"
 
 namespace muduo {
 
@@ -19,7 +20,8 @@ namespace muduo {
                 callback_(cb),
                 expiration_(when),
                 interval_(interval),
-                repeat_(interval > 0.0) {
+                repeat_(interval > 0.0),
+                sequence_(s_numCreated_.incrementAndGet()) {
 
         }
 
@@ -41,6 +43,10 @@ namespace muduo {
         //if repeat, reset expiration_ to next expire time pos, else set expiration_ to invalid Timestamp
         void restart(Timestamp now);
 
+        int64_t sequence() const {
+            return sequence_;
+        }
+
     private:
         //timer callback function
         const TimerCallback callback_;
@@ -50,6 +56,14 @@ namespace muduo {
         const double interval_;
         //if repeat ?
         const bool repeat_;
+
+        //add for cancel timer
+
+        //标记，正好对应当前创建的Timer对象个数
+        const int64_t sequence_;
+
+        //静态变量，记录当前创建了多少Timer对象
+        static AtomicInt64 s_numCreated_;
     };
 }
 
