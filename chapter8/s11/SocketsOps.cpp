@@ -151,6 +151,19 @@ struct sockaddr_in sockets::getLocalAddr(int sockfd)
     return localAddr;
 }
 
+struct sockaddr_in sockets::getPeerAddr(int sockfd){
+    struct sockaddr_in peerAddr;
+    bzero(&peerAddr, sizeof peerAddr);
+    socklen_t addrlen = sizeof(peerAddr);
+    //获取socket file descriptor对应的sockaddr_in信息
+    if (::getpeername(sockfd, sockaddr_cast(&peerAddr), &addrlen)<0)
+    {
+        LOG_SYSERR << "sockets::getLocalAddr";
+    }
+    return peerAddr;
+}
+
+
 int sockets::getSocketError(int sockfd)
 {
     int optval;
@@ -178,4 +191,16 @@ void sockets::shutdownWrite(int sockfd)
     {
         LOG_SYSERR << "sockets::shutdownWrite";
     }
+}
+
+int sockets::connect(int sockfd, const struct sockaddr_in& addr){
+    return ::connect(sockfd,sockaddr_cast(&addr),sizeof(addr));
+}
+
+
+
+bool sockets::isSelfConnect(int sockfd){
+    struct sockaddr_in localaddr = getLocalAddr(sockfd);
+    struct sockaddr_in peeraddr = getPeerAddr(sockfd);
+    return localaddr.sin_port == peeraddr.sin_port && localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
 }

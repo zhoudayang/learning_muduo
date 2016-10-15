@@ -63,6 +63,12 @@ namespace muduo {
         ssize_t readv(int sockfd, const struct iovec *iov, int iovcnt);
 
         void shutdownWrite(int sockfd);
+
+        int connect(int sockfd, const struct sockaddr_in& addr);
+
+        bool isSelfConnect(int sockfd);
+
+        struct sockaddr_in getPeerAddr(int sockfd);
     }
 }
 
